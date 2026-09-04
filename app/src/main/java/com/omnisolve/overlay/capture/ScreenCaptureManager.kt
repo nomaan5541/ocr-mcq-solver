@@ -115,28 +115,24 @@ class ScreenCaptureManager(private val context: Context) {
      * Must be called from a background thread (uses Thread.sleep).
      */
     fun captureCurrentFrame(): Bitmap? {
-        if (!isReady) {
-            Log.e(TAG, "Not ready (isReady=false)")
-            return null
+        if (!isReady || mediaProjection == null) {
+            initVirtualDisplay()
         }
         val reader = imageReader ?: run {
             Log.e(TAG, "ImageReader is null")
             return null
         }
 
-        // Step 1: Drain any stale frames sitting in the buffer
-        drainImageReader(reader)
-
-        // Step 2: Wait for VirtualDisplay to push a fresh frame
+        // Wait for VirtualDisplay to push a fresh frame
         var image: Image? = null
-        val maxAttempts = 30          // 30 × 50ms = 1.5s max wait
+        val maxAttempts = 25 // 25 × 40ms = 1.0s max wait
         for (attempt in 1..maxAttempts) {
-            image = safeAcquireLatest(reader)
+            image = safeAcquireImage(reader)
             if (image != null) {
                 Log.d(TAG, "Frame acquired on attempt $attempt")
                 break
             }
-            Thread.sleep(50)
+            Thread.sleep(40)
         }
 
         if (image == null) {
@@ -151,13 +147,16 @@ class ScreenCaptureManager(private val context: Context) {
         }
     }
 
-    /** Acquire latest image safely — returns null instead of throwing */
-    private fun safeAcquireLatest(reader: ImageReader): Image? {
+    /** Acquire image safely — tries acquireLatestImage then acquireNextImage */
+    private fun safeAcquireImage(reader: ImageReader): Image? {
         return try {
-            reader.acquireLatestImage()
+            reader.acquireLatestImage() ?: reader.acquireNextImage()
         } catch (e: Exception) {
-            Log.w(TAG, "acquireLatestImage failed: ${e.message}")
-            null
+            try {
+                reader.acquireNextImage()
+            } catch (_: Exception) {
+                null
+            }
         }
     }
 

@@ -186,6 +186,7 @@ class OverlayService : Service() {
         val btnScan         = bubbleView!!.findViewById<View>(R.id.btn_scan)
         tvAnswerDisplay     = bubbleView!!.findViewById(R.id.tv_answer_display)
         ivScanIcon          = bubbleView!!.findViewById(R.id.iv_scan_icon)
+        val btnToggleWindow = bubbleView!!.findViewById<View>(R.id.btn_toggle_window)
         val btnClose        = bubbleView!!.findViewById<View>(R.id.btn_close_toolbar)
 
         // Single tap: toggles expanded toolbar; Double tap: toggles 95% Ghost/Dead-Pixel Mode
@@ -216,7 +217,11 @@ class OverlayService : Service() {
             if (!isScanning) triggerSolveFlow()
         }
 
-        // Tapping the answer box toggles full Gemini window for detailed explanation
+        // Tapping the window toggle button or answer box opens/hides Gemini window
+        btnToggleWindow?.setOnClickListener {
+            toggleGeminiWindow()
+        }
+
         tvAnswerDisplay?.setOnClickListener {
             toggleGeminiWindow()
         }
@@ -293,12 +298,13 @@ class OverlayService : Service() {
             btnOpacity.text = opacityLabels[currentOpacityIndex]
         }
 
+        // Minimize / Close window back to bubble (does NOT kill the background service)
         btnMinimize.setOnClickListener {
             showGeminiWindow(false)
         }
 
         btnClose.setOnClickListener {
-            stopSelf()
+            showGeminiWindow(false)
         }
 
         configureWebView(geminiWebView!!)
@@ -514,7 +520,7 @@ class OverlayService : Service() {
                 }
 
                 // 5. Prompt for single-letter answer resolution
-                val promptText = "You are an expert MCQ solver. Analyze this multiple choice question, find the correct option, and reply with ONLY the format 'ANSWER: X' where X is the letter A, B, C, or D followed by the choice text:\n\n$extractedText"
+                val promptText = "CRITICAL INSTRUCTION: You are an expert MCQ Solver. Read the question and the choices below. Identify the single correct option letter (A, B, C, or D).\nSTRICT RULE: Reply ONLY with 'CORRECT_OPTION: X' where X is strictly one letter A, B, C, or D. Do not write any explanations, markdown or greetings.\n\n$extractedText"
 
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 clipboard.setPrimaryClip(ClipData.newPlainText("OmniSolve Question", promptText))
@@ -641,11 +647,9 @@ class OverlayService : Service() {
                         }
                     }, 100);
 
-                    // 5. Observer to extract A/B/C/D from Gemini's response
+                    // 5. Observer to extract strictly A / B / C / D from Gemini's response
                     function startResponseObserver() {
                         let pollCount = 0;
-                        let answerFound = false;
-
                         let pollInterval = setInterval(function() {
                             pollCount++;
                             let responseElements = document.querySelectorAll('.model-response-text, .markdown, message-content, [data-test-id="model-turn"]');
@@ -653,24 +657,29 @@ class OverlayService : Service() {
                                 let lastResp = responseElements[responseElements.length - 1];
                                 let text = lastResp.textContent || "";
                                 
-                                // Look for ANSWER: A/B/C/D or (A)/(B)/(C)/(D)
-                                let match = text.match(/ANSWER:\s*\(?([A-D])\)?/i) ||
-                                            text.match(/Option\s*\(?([A-D])\)?/i) ||
-                                            text.match(/Correct\s*Answer[:\s]*\(?([A-D])\)?/i) ||
-                                            text.match(/\b([A-D])\s*is\s*correct\b/i) ||
-                                            text.match(/^\s*\(?([A-D])\)?[\.\:\s]/m);
+                                // Priority 1: Strict CORRECT_OPTION format
+                                let match = text.match(/CORRECT_OPTION:\s*\(?([A-D])\)?/i);
+                                
+                                // Priority 2: Standard MCQ answer formats
+                                if (!match) match = text.match(/ANSWER:\s*\(?([A-D])\)?/i);
+                                if (!match) match = text.match(/Option\s*\(?([A-D])\)?\s*(?:is\s*(?:the\s*)?correct|is\s*right)/i);
+                                if (!match) match = text.match(/Correct\s*(?:Option|Answer)[:\s]*\(?([A-D])\)?/i);
+                                if (!match) match = text.match(/\b([A-D])\s+is\s+(?:the\s+)?correct\s+(?:option|answer|choice)\b/i);
+                                if (!match) match = text.match(/^\s*\(?([A-D])\)?(?:\.|\:|\s|$)/m);
 
                                 if (match && match[1]) {
-                                    answerFound = true;
-                                    clearInterval(pollInterval);
-                                    if (window.AndroidBridge) {
-                                        window.AndroidBridge.onAnswerResolved(match[1]);
+                                    let letter = match[1].toUpperCase();
+                                    if (['A', 'B', 'C', 'D'].indexOf(letter) !== -1) {
+                                        clearInterval(pollInterval);
+                                        if (window.AndroidBridge) {
+                                            window.AndroidBridge.onAnswerResolved(letter);
+                                        }
+                                        return;
                                     }
-                                    return;
                                 }
                             }
 
-                            if (pollCount > 60) { // 12 seconds timeout
+                            if (pollCount > 75) { // 15 seconds timeout
                                 clearInterval(pollInterval);
                             }
                         }, 200);
