@@ -180,11 +180,38 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
+---
+
+## 📦 Download Packages (Releases)
+
+Pre-built, ready-to-install APK packages are available directly from the [GitHub Releases](https://github.com/nomaan5541/ocr-mcq-solver/releases) tab:
+
+* 📥 **[Download Latest APK (OCR-MCQ-Solver.apk)](https://github.com/nomaan5541/ocr-mcq-solver/releases/latest)**
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+Copyright (c) 2026 nomaan5541 (virus_boss)
+```
+
+---
+
 ## ⭐ Support the Project
 
 If you find **OCR MCQ Solver** helpful, please give this repository a **Star ⭐**!
 
 👉 **[https://github.com/nomaan5541/ocr-mcq-solver](https://github.com/nomaan5541/ocr-mcq-solver)**
+
+---
+
+## 🏷️ Tags & Hashtags
+
+`#android` `#ocr` `#gemini` `#mcq-solver` `#mlkit` `#ai-assistant` `#stealth-overlay` `#kotlin` `#screen-ocr` `#google-gemini` `#virus-boss` `#quiz-solver` `#education` `#android-overlay` `#cheatsheet-solver`
 
 ---
 
