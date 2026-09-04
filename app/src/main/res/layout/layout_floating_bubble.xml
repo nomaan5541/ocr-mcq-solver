@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble_root"
+    android:layout_width="wrap_content"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_toolbar_pill"
+    android:elevation="12dp"
+    android:paddingStart="4dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <!-- Floating AI Icon (Virus Avatar Skin, Draggable, Double-tap for Ghost Mode) -->
+    <FrameLayout
+        android:id="@+id/bubble_icon_container"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_floating_bubble"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/iv_bubble_icon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_virus_avatar"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
+
+    <!-- Expandable Horizontal Toolbar (Hidden by default, shown on icon tap) -->
+    <LinearLayout
+        android:id="@+id/expanded_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        android:layout_marginStart="8dp">
+
+        <!-- Play / Scan Button -->
+        <FrameLayout
+            android:id="@+id/btn_scan"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_scan_button"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iv_scan_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_media_play"
+                android:tint="#FFFFFF" />
+        </FrameLayout>
+
+        <!-- Answer Display Box (Shows A / B / C / D after scan) -->
+        <TextView
+            android:id="@+id/tv_answer_display"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_answer_box"
+            android:gravity="center"
+            android:text="?"
+            android:textColor="#10B981"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Close / Collapse Button -->
+        <ImageView
+            android:id="@+id/btn_close_toolbar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="#8E9BB0"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+</LinearLayout>
