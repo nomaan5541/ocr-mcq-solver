@@ -243,7 +243,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <!-- Star & Follow virus_boss Card -->
+        <!-- Star Repo on GitHub Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -255,7 +255,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⭐ Support the Project"
+                android:text="⭐ Star the Repository"
                 android:textColor="#FBBF24"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -265,7 +265,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="If you like this app, please give it a Star on GitHub and follow virus_boss!"
+                android:text="If you find this application helpful, please give this repository a Star on GitHub!"
                 android:textColor="#94A3B8"
                 android:textSize="12sp" />
 
@@ -274,10 +274,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="#1F2937"
-                android:text="⭐ Star on GitHub &amp; Follow @virus_boss"
-                android:textColor="#F3F4F6"
-                android:textSize="13sp" />
+                android:backgroundTint="#2563EB"
+                android:text="⭐ Star this Repo on GitHub"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
