@@ -92,11 +92,11 @@ class MainActivity : AppCompatActivity() {
             try {
                 val browserIntent = Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://github.com")
+                    Uri.parse("https://github.com/nomaan5541/ocr-mcq-solver")
                 )
                 startActivity(browserIntent)
             } catch (e: Exception) {
-                Toast.makeText(this, "Opening browser...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Opening GitHub...", Toast.LENGTH_SHORT).show()
             }
         }
 
