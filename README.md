@@ -20,9 +20,18 @@
 
 ## 📌 Overview
 
-**OCR MCQ Solver** is an advanced, stealth-optimized Android utility designed to solve multiple-choice questions (MCQs) directly on-screen in real-time. It operates as a non-intrusive Android System Overlay (`TYPE_APPLICATION_OVERLAY`) over any application (such as Google Chrome, quiz platforms, or test-taking environments) without causing focus loss, app-switching lifecycle events (`onPause`/`onStop`), or blocking user interaction with on-screen answer choices.
+**OmniSolve OCR MCQ Solver** is an advanced, stealth-optimized Android AI exam assistant designed to solve multiple-choice questions (MCQs) directly on-screen in real-time. It operates as a non-intrusive Android System Overlay (`TYPE_APPLICATION_OVERLAY`) over any application (such as Google Chrome, quiz platforms, or test-taking environments) without causing focus loss, app-switching lifecycle events (`onPause`/`onStop`), or blocking user interaction with on-screen answer choices.
 
-By coupling on-device **Google ML Kit Vision OCR** with a **Headless Background Google Gemini Web Engine**, the application bypasses standard API rate-limit bottlenecks (`HTTP 429 LIM`) and provides instantaneous single-letter answers (`A`, `B`, `C`, or `D`) directly on a customizable floating HUD.
+### ✨ Next-Gen Key Features
+* 🪼 **Liquid Glass UI & Dynamic Island**: Translucent Apple iOS 26 frosted glass aesthetics with specular borders and pill HUD.
+* 🌓 **Dark Liquid Glass 🌙 / White Crystal Glass ☀️ Switch**: Instant live switching between dark obsidian glass and frosted white crystal glass.
+* 🧪 **Interactive Liquid Jelly Physics**: Dynamic drag velocity stretching, movement tilt rotation, and decaying damped elastic wobble rebound (`OvershootInterpolator(3.5f)`).
+* ⚡ **0ms Native Accessibility Node Scraping**: Inspects the app's native UI tree (`rootInActiveWindow`) for 0ms text extraction and direct node clicking with zero screenshots.
+* 🤖 **AEI Autonomous AFK Hands-Free Bot**: Solves, clicks the correct choice, and auto-advances through "Save & Next" / "Next" without touching the device.
+* 🛡️ **Anti-Cheat Humanizer Protection**: Gaussian coordinate jitter and randomized human cognitive reading delays.
+* 📳 **Silent Haptic Vibration Feedback**: Discreet pulses (1 pulse = A, 2 = B, 3 = C, 4 = D) for situations where HUD visibility is risky.
+* 🔋 **Battery Disguise Camouflage**: Renders answers disguised as system battery percentages (91%=A, 92%=B, 93%=C, 94%=D).
+* 🌐 **Unlimited Background Gemini Web Engine**: Directly interfaces with Google Gemini via in-app Google login, bypassing rate-limiting API keys.
 
 ---
 
@@ -184,9 +193,10 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ## 📦 Download Packages (Releases)
 
-Pre-built, ready-to-install APK packages are available directly from the [GitHub Releases](https://github.com/nomaan5541/ocr-mcq-solver/releases) tab:
+Pre-built, ready-to-install APK packages are available directly from the repository root and [GitHub Releases](https://github.com/nomaan5541/ocr-mcq-solver/releases):
 
-* 📥 **[Download Latest APK (OCR-MCQ-Solver.apk)](https://github.com/nomaan5541/ocr-mcq-solver/releases/latest)**
+* 📥 **[Download Latest APK (OmniSolve-Overlay.apk)](OmniSolve-Overlay.apk)**
+* 🚀 **[GitHub Releases Page](https://github.com/nomaan5541/ocr-mcq-solver/releases/latest)**
 
 ---
 

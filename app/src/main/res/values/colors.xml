@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_dark">#0A0D14</color>
-    <color name="bg_card">#121826</color>
+    <!-- Base Canvas Colors -->
+    <color name="bg_dark">#070A12</color>
+    <color name="bg_card">#0F1524</color>
+
+    <!-- Liquid Glass Palette -->
+    <color name="glass_bg">#CC0F172A</color>
+    <color name="glass_bg_tile">#B3151F33</color>
+    <color name="glass_bg_emerald">#B306231A</color>
+    <color name="glass_border">#26FFFFFF</color>
+    <color name="glass_border_accent">#5900F2FE</color>
+    <color name="glass_border_emerald">#5910B981</color>
+    <color name="glass_border_violet">#598B5CF6</color>
+    <color name="glass_highlight">#40FFFFFF</color>
+
+    <!-- Vibrant Accents -->
     <color name="accent_cyan">#00F2FE</color>
     <color name="accent_emerald">#10B981</color>
-    <color name="text_main">#F0F4FD</color>
-    <color name="text_muted">#8E9BB0</color>
+    <color name="accent_violet">#8B5CF6</color>
+    <color name="accent_amber">#F59E0B</color>
+    <color name="accent_rose">#F43F5E</color>
+
+    <!-- Typography -->
+    <color name="text_main">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_muted">#64748B</color>
+
+    <!-- White / Light Crystal Glass Palette -->
+    <color name="light_bg_canvas">#F1F5F9</color>
+    <color name="light_glass_bg">#E6FFFFFF</color>
+    <color name="light_glass_tile">#F0F8FAFC</color>
+    <color name="light_glass_border">#3300C6FF</color>
+    <color name="light_glass_border_accent">#800072FF</color>
+    <color name="light_text_main">#0F172A</color>
+    <color name="light_text_secondary">#475569</color>
+    <color name="light_text_muted">#64748B</color>
 </resources>

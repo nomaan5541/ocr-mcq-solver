@@ -10,3 +10,5 @@
 .cxx
 app/build
 *.zip
+.agents/
+graphify-out/

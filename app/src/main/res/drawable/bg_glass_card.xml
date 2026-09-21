@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Liquid Frosted Translucent Fill -->
+    <gradient
+        android:startColor="#D9131C30"
+        android:endColor="#D90C1220"
+        android:angle="270" />
+    <corners android:radius="20dp" />
+    <!-- Specular Rim Border -->
+    <stroke
+        android:width="1.2dp"
+        android:color="#33FFFFFF" />
+</shape>

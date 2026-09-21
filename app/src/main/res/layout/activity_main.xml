@@ -1,285 +1,664 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0D14"
-    android:padding="16dp">
+    android:background="@color/bg_dark">
 
+    <!-- ─── Top Frosted Liquid Glass Header Bar ─────────────────────────────── -->
     <LinearLayout
+        android:id="@+id/header_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_alignParentTop="true"
+        android:background="@drawable/bg_glass_header"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp">
 
-        <!-- Virus Branding Banner Header -->
+        <ImageView
+            android:id="@+id/iv_app_logo"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/virus_logo" />
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#121826"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="18dp"
-            android:layout_marginBottom="16dp">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <!-- Virus Avatar Image -->
-            <FrameLayout
-                android:layout_width="84dp"
-                android:layout_height="84dp"
-                android:background="@drawable/bg_floating_bubble"
-                android:padding="2dp">
-
-                <ImageView
-                    android:id="@+id/iv_main_avatar"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/virus_logo"
-                    android:scaleType="centerCrop" />
-            </FrameLayout>
-
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="⚡ OCR MCQ Solver"
-                android:textColor="#00F2FE"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_app_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OmniSolve"
+                    android:textColor="#F8FAFC"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_theme_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_glass_chip"
+                    android:paddingStart="6dp"
+                    android:paddingTop="1dp"
+                    android:paddingEnd="6dp"
+                    android:paddingBottom="1dp"
+                    android:text="LIQUID GLASS"
+                    android:textColor="#00F2FE"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_app_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Created by virus_boss 🔥"
-                android:textColor="#A78BFA"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Next-Gen Stealth MCQ AI Solver"
+                android:text="Next-Gen AI Exam Assistant"
                 android:textColor="#94A3B8"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Instructions & Detailing Card -->
+        <!-- Theme Toggle Button (Dark Liquid vs White Crystal) -->
+        <FrameLayout
+            android:id="@+id/btn_theme_toggle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_glass_profile"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iv_theme_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_theme_sun" />
+        </FrameLayout>
+
+        <!-- Profile Avatar / Google Login Button in Top Bar -->
+        <FrameLayout
+            android:id="@+id/btn_profile_account"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_glass_profile"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_glass_account" />
+
+            <!-- Online / Login Status Dot -->
+            <View
+                android:id="@+id/iv_profile_status_dot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="3dp"
+                android:background="@drawable/bg_status_dot" />
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- ─── Scrollable Dashboard Content ────────────────────────────────────── -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_dock"
+        android:layout_below="@id/header_bar"
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="24dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#161B2E"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📖 How to Use &amp; Instructions"
-                android:textColor="#38BDF8"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
+            <!-- Google Account Status Strip -->
+            <LinearLayout
+                android:id="@+id/card_google_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="• Step 1: Login to Google / Gemini first to unlock maximum AI speed with zero rate limits.\n• Step 2: Grant the 2 required permissions below.\n• Step 3: Tap 'Start Overlay' and open your exam or Chrome.\n• Step 4: Single-Tap the floating virus icon to solve.\n• Step 5 (Ghost Mode): Double-Tap the floating virus icon anytime to turn it 95% invisible (Dead-Pixel Mode)."
-                android:textColor="#CBD5E1"
-                android:textSize="12sp"
-                android:lineSpacingExtra="3dp" />
-        </LinearLayout>
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="8dp">
 
-        <!-- 1. Google Account Login Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#121826"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+                <TextView
+                    android:id="@+id/tv_google_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Checking Login Status..."
+                    android:textColor="#F59E0B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1. Google / Gemini Account"
-                android:textColor="#F0F4FD"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btn_login_google"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:backgroundTint="#7C3AED"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="🔑 Login"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_google_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Checking Login Status..."
-                android:textColor="#F59E0B"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btn_login_google"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#7C3AED"
-                android:text="🔑 Log into Google / Gemini"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <!-- 2. Display Mode Selector Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#121826"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2. Overlay Display Mode"
-                android:textColor="#F0F4FD"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <RadioGroup
-                android:id="@+id/rg_display_mode"
+            <!-- ─── ROW 1: Multi-Column (Engine & HUD Style) ────────────────────── -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp">
+                android:layout_marginBottom="12dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/rb_stealth_mode"
+                <!-- Column 1: Extraction Engine -->
+                <LinearLayout
+                    android:id="@+id/card_engine"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Engine"
+                        android:textColor="#F0F4FD"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/rg_extraction_engine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp">
+
+                        <RadioButton
+                            android:id="@+id/rb_engine_native"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="⚡ Native A11y\n(0ms Instant)"
+                            android:textColor="#38BDF8"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <RadioButton
+                            android:id="@+id/rb_engine_ocr"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="📷 Screen OCR\n(Universal)"
+                            android:textColor="#E2E8F0"
+                            android:textSize="11sp" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- Column 2: HUD Style -->
+                <LinearLayout
+                    android:id="@+id/card_hud_style"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🏝️ HUD Style"
+                        android:textColor="#F0F4FD"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/rg_hud_style"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp">
+
+                        <RadioButton
+                            android:id="@+id/rb_hud_island"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="🏝️ Dynamic Pill\n(Top centered)"
+                            android:textColor="#38BDF8"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <RadioButton
+                            android:id="@+id/rb_hud_bubble"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="🫧 Virus Bubble\n(Floating circle)"
+                            android:textColor="#E2E8F0"
+                            android:textSize="11sp" />
+                    </RadioGroup>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ─── ROW 2: Multi-Column (Camouflage & Silent Haptics) ───────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <!-- Column 1: Battery Disguise -->
+                <LinearLayout
+                    android:id="@+id/card_camo"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <Switch
+                        android:id="@+id/sw_battery_camouflage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="🔋 Battery Camo"
+                        android:textColor="#F0F4FD"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_camouflage_guide"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="91% A • 92% B\n93% C • 94% D"
+                        android:textColor="#10B981"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Column 2: Silent Haptics -->
+                <LinearLayout
+                    android:id="@+id/card_haptics"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_glass_card"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <Switch
+                        android:id="@+id/sw_haptic_feedback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="📳 Silent Haptic"
+                        android:textColor="#38BDF8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="1 pulse A • 2=B\n3 pulses C • 4=D"
+                        android:textColor="#94A3B8"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ─── SECTION 3: Overlay Display Mode ─────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_display_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🥷 Overlay Display Mode"
+                    android:textColor="#F0F4FD"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <RadioGroup
+                    android:id="@+id/rg_display_mode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="🥷 Stealth Option-Only Mode\n(Gemini runs invisibly; bubble shows ONLY A/B/C/D)"
-                    android:textColor="#E2E8F0"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="6dp">
 
-                <RadioButton
-                    android:id="@+id/rb_window_mode"
+                    <RadioButton
+                        android:id="@+id/rb_stealth_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="👻 Ghost Stealth Mode (Minimal discreet pill HUD)"
+                        android:textColor="#E2E8F0"
+                        android:textSize="12sp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_window_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="🪟 Floating Gemini Web Window (Draggable browser)"
+                        android:textColor="#E2E8F0"
+                        android:textSize="12sp" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- ─── SECTION 4: AEI Autonomous Bot Control Deck ──────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_aei_bot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card_emerald"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🤖 AEI Autonomous Bot Deck"
+                        android:textColor="#34D399"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_chip"
+                        android:paddingStart="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="6dp"
+                        android:paddingBottom="2dp"
+                        android:text="AUTONOMOUS"
+                        android:textColor="#10B981"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/sw_auto_click_bot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:checked="false"
+                    android:text="⚡ Auto-Click Correct Answer"
+                    android:textColor="#F0F4FD"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/sw_afk_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:checked="false"
+                    android:text="🚀 AEI Full AFK Bot (Auto Next / Save &amp; Next)"
+                    android:textColor="#10B981"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/sw_anti_cheat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:checked="true"
+                    android:text="🛡️ Anti-Cheat Humanizer Protection"
+                    android:textColor="#38BDF8"
+                    android:textSize="13sp" />
+
+                <Switch
+                    android:id="@+id/sw_instant_trigger"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:checked="true"
+                    android:text="⚡ Instant Trigger on Screen Change"
+                    android:textColor="#E2E8F0"
+                    android:textSize="13sp" />
+
+                <!-- Speed Interval Deck -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_scan_interval_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Scan Speed Interval: 3s"
+                        android:textColor="#E2E8F0"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_speed_preset_tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Fast"
+                        android:textColor="#38BDF8"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/sb_scan_interval"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="📱 Visible Window Mode\n(Shows floating mini Gemini chat card on screen)"
+                    android:max="9"
+                    android:progress="2" />
+
+                <!-- Auto-Advance Next Delay -->
+                <TextView
+                    android:id="@+id/tv_next_delay_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Auto-Advance 'Next' Delay: 1.5s"
                     android:textColor="#E2E8F0"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <SeekBar
+                    android:id="@+id/sb_next_delay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:max="6"
+                    android:progress="2" />
+
+            </LinearLayout>
+
+            <!-- ─── SECTION 5: System Readiness & Permissions ───────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_permissions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡️ System Permissions &amp; Readiness"
+                    android:textColor="#F0F4FD"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_accessibility_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="⚠️ Accessibility Service: Not Enabled"
+                    android:textColor="#F59E0B"
                     android:textSize="12sp" />
 
-            </RadioGroup>
+                <Button
+                    android:id="@+id/btn_open_accessibility"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:layout_marginTop="6dp"
+                    android:backgroundTint="#1E293B"
+                    android:text="⚙️ Open Accessibility Settings"
+                    android:textColor="#38BDF8"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Screen Capture: "
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tv_capture_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Not Authorized"
+                        android:textColor="#F59E0B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Overlay Status: "
+                        android:textColor="#94A3B8"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tv_overlay_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Stopped"
+                        android:textColor="#F59E0B"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="🔊 Hardware Trigger: Volume Up/Down scans &amp; solves silently."
+                    android:textColor="#10B981"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/btn_star_github"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="🌐 GitHub: nomaan5541/ocr-mcq-solver"
+                    android:textColor="#38BDF8"
+                    android:textSize="11sp" />
+            </LinearLayout>
 
         </LinearLayout>
+    </ScrollView>
 
-        <!-- 3. Permissions Status Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#121826"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+    <!-- ─── Bottom Floating Liquid Glass Launch CTA Dock ────────────────────── -->
+    <FrameLayout
+        android:id="@+id/bottom_dock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_glass_header"
+        android:elevation="12dp"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="3. System Permissions"
-                android:textColor="#F0F4FD"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="• Draw Over Other Apps:"
-                android:textColor="#8E9BB0"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_overlay_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Checking..."
-                android:textColor="#00F2FE"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="• Screen Capture Authorization:"
-                android:textColor="#8E9BB0"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_capture_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Not Authorized (Prompts on Start)"
-                android:textColor="#8E9BB0"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Main Start / Stop Button -->
         <Button
             android:id="@+id/btn_toggle_overlay"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:backgroundTint="#00F2FE"
-            android:text="Start Real-Time Overlay Service"
-            android:textColor="#000000"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_glass_cta"
+            android:text="🚀 Launch OmniSolve Overlay"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
             android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+            android:textStyle="bold" />
+    </FrameLayout>
 
-        <!-- Star Repo on GitHub Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#161B2E"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⭐ Star the Repository"
-                android:textColor="#FBBF24"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="If you find this application helpful, please give this repository a Star on GitHub!"
-                android:textColor="#94A3B8"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btn_star_github"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#2563EB"
-                android:text="⭐ Star this Repo on GitHub"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>
