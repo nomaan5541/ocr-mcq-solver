@@ -16,11 +16,11 @@
 [![Itch.io](https://img.shields.io/badge/Itch.io-Available%20Now-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://nomaan.itch.io/ocr-mcq-solver)
 [![License](https://img.shields.io/badge/License-MIT-F58025?style=for-the-badge)](LICENSE)
 
-<br/>
+<a href="https://nomaan.itch.io/ocr-mcq-solver">
+  <img src="images/itch_cover.png" width="554" alt="Download ocr-mcq-solver on itch.io" />
+</a>
 
-<iframe frameborder="0" src="https://itch.io/embed/5079185?border_width=2&amp;bg_color=000000&amp;fg_color=e26f16&amp;link_color=d42330&amp;border_color=ad4a0d" width="554" height="169"><a href="https://nomaan.itch.io/ocr-mcq-solver">ocr-mcq-solver by NOMAAN KHAN</a></iframe>
-
-<br/>
+<br/><br/>
 
 [![Download on itch.io](https://img.shields.io/badge/🎮%20Download%20on-itch.io-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://nomaan.itch.io/ocr-mcq-solver)
 [![Direct APK Download](https://img.shields.io/badge/📦%20Download-Latest%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/nomaan5541/ocr-mcq-solver/releases/download/final-update/OmniSolve-v1.0.0.apk)
