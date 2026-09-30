@@ -13,9 +13,17 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026--35)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Language](https://img.shields.io/badge/Kotlin-1.9.24-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 [![Target SDK](https://img.shields.io/badge/Target%20SDK-34%20(Compile%2035)-007ACC?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
-[![Gradle](https://img.shields.io/badge/Gradle-8.7-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
-[![AGP](https://img.shields.io/badge/AGP-8.5.2-brightgreen?style=for-the-badge&logo=androidstudio&logoColor=white)](https://developer.android.com/studio/releases/gradle-plugin)
+[![Itch.io](https://img.shields.io/badge/Itch.io-Available%20Now-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://nomaan.itch.io/ocr-mcq-solver)
 [![License](https://img.shields.io/badge/License-MIT-F58025?style=for-the-badge)](LICENSE)
+
+<br/>
+
+<iframe frameborder="0" src="https://itch.io/embed/5079185?border_width=2&amp;bg_color=000000&amp;fg_color=e26f16&amp;link_color=d42330&amp;border_color=ad4a0d" width="554" height="169"><a href="https://nomaan.itch.io/ocr-mcq-solver">ocr-mcq-solver by NOMAAN KHAN</a></iframe>
+
+<br/>
+
+[![Download on itch.io](https://img.shields.io/badge/🎮%20Download%20on-itch.io-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://nomaan.itch.io/ocr-mcq-solver)
+[![Direct APK Download](https://img.shields.io/badge/📦%20Download-Latest%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/nomaan5541/ocr-mcq-solver/releases/download/final-update/OmniSolve-v1.0.0.apk)
 
 </div>
 
