@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#F20F172A"
-        android:endColor="#E6080C16"
-        android:angle="270" />
-    <corners android:radius="20dp" />
-    <stroke
-        android:width="1.5dp"
-        android:color="#4D00F2FE" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gemini Window Background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#F00D1424"
+                android:centerColor="#ED0A1020"
+                android:endColor="#F2060910"
+                android:angle="270" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <stroke
+                android:width="1.2dp"
+                android:color="#3500D4FF" />
+        </shape>
+    </item>
+</layer-list>

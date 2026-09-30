@@ -3,6 +3,7 @@
     android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@color/bg_dark">
 
     <!-- ─── Top Frosted Liquid Glass Header Bar ─────────────────────────────── -->
@@ -273,6 +274,223 @@
                     </RadioGroup>
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <!-- ─── DYNAMIC ISLAND VISIBILITY CARD ──────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_island_visibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="👁️ Dynamic Island Visibility"
+                        android:textColor="#F0F4FD"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_island_visibility_tag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_chip"
+                        android:paddingStart="7dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="7dp"
+                        android:paddingBottom="2dp"
+                        android:text="100% OPACITY"
+                        android:textColor="#38BDF8"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Control floating Dynamic Island transparency (also cycle via double-tap)"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp" />
+
+                <!-- 4 Visibility Selector Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_vis_100"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_chip_action"
+                        android:text="100%"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btn_vis_90"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_glass_chip"
+                        android:text="90%"
+                        android:textColor="#E2E8F0"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btn_vis_50"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/bg_glass_chip"
+                        android:text="50%"
+                        android:textColor="#E2E8F0"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btn_vis_25"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_glass_chip"
+                        android:text="25%"
+                        android:textColor="#E2E8F0"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ─── RECOMMENDED DYNAMIC ISLAND PRESETS ──────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_recommended_presets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card_accent"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🏝️ Dynamic Island Presets"
+                        android:textColor="#00D4FF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_chip"
+                        android:paddingStart="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="6dp"
+                        android:paddingBottom="2dp"
+                        android:text="RECOMMENDED"
+                        android:textColor="#00D4FF"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Tap a preset to auto-configure optimal Dynamic Island settings"
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp" />
+
+                <!-- Preset Buttons Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <!-- Exam Mode Preset -->
+                    <Button
+                        android:id="@+id/btn_preset_exam"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:backgroundTint="#1A10B981"
+                        android:text="📝 Exam"
+                        android:textAllCaps="false"
+                        android:textColor="#10B981"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <!-- Turbo Mode Preset -->
+                    <Button
+                        android:id="@+id/btn_preset_turbo"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:backgroundTint="#1AF43F5E"
+                        android:text="🚀 Turbo"
+                        android:textAllCaps="false"
+                        android:textColor="#F43F5E"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <!-- Stealth Mode Preset -->
+                    <Button
+                        android:id="@+id/btn_preset_stealth"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:backgroundTint="#1A8B5CF6"
+                        android:text="👻 Stealth"
+                        android:textAllCaps="false"
+                        android:textColor="#8B5CF6"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Active Preset Indicator -->
+                <TextView
+                    android:id="@+id/tv_active_preset"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Active: Custom"
+                    android:textColor="#64748B"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- ─── ROW 2: Multi-Column (Camouflage & Silent Haptics) ───────────── -->

@@ -1,38 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Canvas Colors -->
-    <color name="bg_dark">#070A12</color>
-    <color name="bg_card">#0F1524</color>
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- LIQUID GLASS DESIGN SYSTEM — Inspired by Apple Liquid Glass / Flutter -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-    <!-- Liquid Glass Palette -->
-    <color name="glass_bg">#CC0F172A</color>
-    <color name="glass_bg_tile">#B3151F33</color>
-    <color name="glass_bg_emerald">#B306231A</color>
-    <color name="glass_border">#26FFFFFF</color>
-    <color name="glass_border_accent">#5900F2FE</color>
-    <color name="glass_border_emerald">#5910B981</color>
-    <color name="glass_border_violet">#598B5CF6</color>
-    <color name="glass_highlight">#40FFFFFF</color>
+    <!-- ─── Deep Dark Canvas ─────────────────────────────────────────────── -->
+    <color name="bg_dark">#060910</color>
+    <color name="bg_card">#0C1222</color>
+    <color name="bg_surface">#0A0F1C</color>
 
-    <!-- Vibrant Accents -->
-    <color name="accent_cyan">#00F2FE</color>
+    <!-- ─── Liquid Glass Core Palette ────────────────────────────────────── -->
+    <color name="glass_bg">#B30D152A</color>
+    <color name="glass_bg_deep">#CC0A1020</color>
+    <color name="glass_bg_tile">#A6121C30</color>
+    <color name="glass_bg_emerald">#990A1F18</color>
+    <color name="glass_bg_violet">#991A0A30</color>
+
+    <!-- ─── Liquid Glass Specular Borders ────────────────────────────────── -->
+    <color name="glass_border">#30FFFFFF</color>
+    <color name="glass_border_bright">#40FFFFFF</color>
+    <color name="glass_border_accent">#6600D4FF</color>
+    <color name="glass_border_emerald">#6610B981</color>
+    <color name="glass_border_violet">#668B5CF6</color>
+    <color name="glass_border_rose">#66F43F5E</color>
+
+    <!-- ─── Liquid Glass Rim Highlights ──────────────────────────────────── -->
+    <color name="glass_highlight">#35FFFFFF</color>
+    <color name="glass_highlight_top">#50FFFFFF</color>
+    <color name="glass_highlight_bottom">#10FFFFFF</color>
+    <color name="glass_inner_shadow">#1A000000</color>
+
+    <!-- ─── Vibrant Accent Spectrum ──────────────────────────────────────── -->
+    <color name="accent_cyan">#00D4FF</color>
+    <color name="accent_cyan_glow">#6600D4FF</color>
     <color name="accent_emerald">#10B981</color>
+    <color name="accent_emerald_glow">#4010B981</color>
     <color name="accent_violet">#8B5CF6</color>
+    <color name="accent_violet_glow">#408B5CF6</color>
     <color name="accent_amber">#F59E0B</color>
     <color name="accent_rose">#F43F5E</color>
+    <color name="accent_rose_glow">#40F43F5E</color>
+    <color name="accent_blue">#3B82F6</color>
+    <color name="accent_indigo">#6366F1</color>
 
-    <!-- Typography -->
-    <color name="text_main">#F8FAFC</color>
+    <!-- ─── Gradient Endpoints ───────────────────────────────────────────── -->
+    <color name="gradient_cta_start">#00D4FF</color>
+    <color name="gradient_cta_end">#6366F1</color>
+    <color name="gradient_header_start">#E60D1424</color>
+    <color name="gradient_header_end">#F2060910</color>
+    <color name="gradient_card_start">#CC101828</color>
+    <color name="gradient_card_end">#CC0A1020</color>
+    <color name="gradient_emerald_start">#CC0D2E20</color>
+    <color name="gradient_emerald_end">#CC081A14</color>
+
+    <!-- ─── Typography Colors ────────────────────────────────────────────── -->
+    <color name="text_main">#F0F4FD</color>
     <color name="text_secondary">#94A3B8</color>
     <color name="text_muted">#64748B</color>
+    <color name="text_accent">#00D4FF</color>
 
-    <!-- White / Light Crystal Glass Palette -->
-    <color name="light_bg_canvas">#F1F5F9</color>
-    <color name="light_glass_bg">#E6FFFFFF</color>
-    <color name="light_glass_tile">#F0F8FAFC</color>
-    <color name="light_glass_border">#3300C6FF</color>
-    <color name="light_glass_border_accent">#800072FF</color>
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- CRYSTAL GLASS (Light Mode) PALETTE                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+    <color name="light_bg_canvas">#F0F4FA</color>
+    <color name="light_glass_bg">#E8FFFFFF</color>
+    <color name="light_glass_tile">#F2F8FAFC</color>
+    <color name="light_glass_border">#4000B8E0</color>
+    <color name="light_glass_border_accent">#8000A0FF</color>
     <color name="light_text_main">#0F172A</color>
     <color name="light_text_secondary">#475569</color>
     <color name="light_text_muted">#64748B</color>
+    <color name="light_accent_primary">#0072FF</color>
+
+    <!-- ─── Dynamic Island Colors ────────────────────────────────────────── -->
+    <color name="island_bg">#E6080C18</color>
+    <color name="island_border">#4000D4FF</color>
+    <color name="island_glow">#3300D4FF</color>
 </resources>

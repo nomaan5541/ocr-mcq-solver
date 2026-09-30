@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <gradient
-        android:startColor="#F0131E33"
-        android:endColor="#E60A101C"
-        android:angle="135" />
-    <stroke
-        android:width="1.8dp"
-        android:color="#8000F2FE" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Liquid Glass Circle Fill -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#CC101828"
+                android:endColor="#CC080C18"
+                android:angle="270" />
+        </shape>
+    </item>
+    <!-- Glass Circle Highlight -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#12FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
+        </shape>
+    </item>
+    <!-- Specular Ring Border -->
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="1.5dp"
+                android:color="#3500D4FF" />
+        </shape>
+    </item>
+</layer-list>

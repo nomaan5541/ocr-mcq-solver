@@ -100,6 +100,24 @@
             android:focusable="true"
             android:contentDescription="Toggle Auto-Click Bot" />
 
+        <!-- Opacity / Visibility Toggle Button (100% -> 90% -> 50% -> 25%) -->
+        <TextView
+            android:id="@+id/btn_bubble_opacity"
+            android:layout_width="wrap_content"
+            android:minWidth="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="6dp"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp"
+            android:gravity="center"
+            android:background="@drawable/bg_chip_action"
+            android:text="👁 100%"
+            android:textColor="#38BDF8"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
         <!-- Close / Collapse Button -->
         <ImageView
             android:id="@+id/btn_close_toolbar"

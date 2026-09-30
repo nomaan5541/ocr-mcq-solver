@@ -64,6 +64,7 @@ class OverlayService : Service() {
         const val EXTRA_HAPTIC = "EXTRA_HAPTIC"
         const val EXTRA_ANTI_CHEAT = "EXTRA_ANTI_CHEAT"
         const val EXTRA_THEME_MODE = "EXTRA_THEME_MODE"
+        const val EXTRA_ISLAND_OPACITY_INDEX = "EXTRA_ISLAND_OPACITY_INDEX"
 
         private const val GEMINI_WEB_URL = "https://gemini.google.com/"
         private const val CHROME_USER_AGENT =
@@ -113,6 +114,37 @@ class OverlayService : Service() {
     // Dynamic Island specific view references
     private var tvIslandTitle: TextView? = null
     private var ivIslandIcon: ImageView? = null
+    private var btnIslandOpacity: TextView? = null
+
+    // Dynamic Island Visibility / Opacity Presets: 100%, 90%, 50%, 25%
+    private var currentIslandOpacityIndex = 0
+    private val islandOpacityLevels = floatArrayOf(1.0f, 0.90f, 0.50f, 0.25f)
+    private val islandOpacityLabels = arrayOf("👁 100%", "👁 90%", "👁 50%", "👁 25%")
+
+    private fun applyIslandOpacity(index: Int, showToast: Boolean = true) {
+        currentIslandOpacityIndex = (index + islandOpacityLevels.size) % islandOpacityLevels.size
+        val targetAlpha = islandOpacityLevels[currentIslandOpacityIndex]
+        val label = islandOpacityLabels[currentIslandOpacityIndex]
+
+        bubbleView?.animate()?.cancel()
+        bubbleView?.animate()
+            ?.alpha(targetAlpha)
+            ?.setDuration(240)
+            ?.setInterpolator(DecelerateInterpolator())
+            ?.start()
+
+        btnIslandOpacity?.text = label
+
+        try {
+            getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
+                .edit().putInt("PREF_ISLAND_OPACITY_INDEX", currentIslandOpacityIndex).apply()
+        } catch (_: Exception) {}
+
+        if (showToast) {
+            val pct = (targetAlpha * 100).toInt()
+            Toast.makeText(this, "👁 Dynamic Island Visibility: $pct%", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Bubble overlay (Small stealth HUD)
     private var bubbleView: View? = null
@@ -269,6 +301,11 @@ class OverlayService : Service() {
                 .getString(MainActivity.PREF_KEY_THEME_MODE, MainActivity.THEME_DARK)
                 ?: MainActivity.THEME_DARK
 
+        val opacityIdx = intent?.getIntExtra(EXTRA_ISLAND_OPACITY_INDEX, -1) ?: -1
+        if (opacityIdx in islandOpacityLevels.indices) {
+            currentIslandOpacityIndex = opacityIdx
+        }
+
         val resultCode = intent?.getIntExtra(EXTRA_RESULT_CODE, Activity.RESULT_CANCELED)
             ?: Activity.RESULT_CANCELED
         @Suppress("DEPRECATION")
@@ -358,14 +395,15 @@ class OverlayService : Service() {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
+            val statusBarH = getStatusBarHeight()
             if (isIsland) {
                 gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
                 x = 0
-                y = 20
+                y = statusBarH + dpToPx(8)
             } else {
                 gravity = Gravity.TOP or Gravity.START
                 x = 24
-                y = 350
+                y = statusBarH + dpToPx(80)
             }
         }
 
@@ -418,10 +456,26 @@ class OverlayService : Service() {
             }
         }
 
+        // Opacity / Visibility Toggle Button (100% -> 90% -> 50% -> 25%)
+        val btnOpacityView: TextView? = if (isIsland) {
+            bubbleView!!.findViewById(R.id.btn_island_opacity)
+        } else {
+            bubbleView!!.findViewById(R.id.btn_bubble_opacity)
+        }
+        btnIslandOpacity = btnOpacityView
+
+        val savedOpacity = getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
+            .getInt("PREF_ISLAND_OPACITY_INDEX", currentIslandOpacityIndex)
+        applyIslandOpacity(savedOpacity, showToast = false)
+
+        btnOpacityView?.setOnClickListener {
+            applyIslandOpacity(currentIslandOpacityIndex + 1)
+        }
+
         // Update bot toggle icon state
         updateBotToggleUI()
 
-        // Single tap: toggles expanded toolbar with fluid morphing; Double tap: toggles 95% Ghost/Dead-Pixel Mode
+        // Single tap: toggles expanded toolbar with fluid morphing; Double tap: cycles Dynamic Island visibility (100% -> 90% -> 50% -> 25%)
         bubbleContainer.setOnTouchListener(createDragAndTapListener(
             bubbleParams,
             { bubbleView },
@@ -438,14 +492,7 @@ class OverlayService : Service() {
                 try { windowManager.updateViewLayout(bubbleView, bubbleParams) } catch (_: Exception) {}
             },
             onDoubleTap = {
-                isGhostMode = !isGhostMode
-                if (isGhostMode) {
-                    bubbleView?.alpha = 0.05f // 95% transparent ghost mode
-                    Toast.makeText(this@OverlayService, "🥷 Ghost Mode: 95% Invisible", Toast.LENGTH_SHORT).show()
-                } else {
-                    bubbleView?.alpha = 1.0f
-                    Toast.makeText(this@OverlayService, "👁 Normal Visibility Restored", Toast.LENGTH_SHORT).show()
-                }
+                applyIslandOpacity(currentIslandOpacityIndex + 1)
             }
         ))
 
@@ -691,16 +738,17 @@ class OverlayService : Service() {
         webView.addJavascriptInterface(object {
             @JavascriptInterface
             fun onAnswerResolved(answerLetter: String) {
-                Log.d(TAG, "Bridge onAnswerResolved: $answerLetter")
+                val letter = answerLetter.trim().uppercase()
+                Log.d(TAG, "Bridge onAnswerResolved: $letter")
                 mainHandler.post {
-                    setAnswerUI(answerLetter.trim().uppercase(), "#10B981")
+                    setAnswerUI(letter, "#10B981")
                 }
             }
 
             @JavascriptInterface
             fun onAutoClickAnswer(answerLetter: String) {
-                Log.d(TAG, "AutoClick Bridge received: $answerLetter")
                 val letter = answerLetter.trim().uppercase()
+                Log.d(TAG, "AutoClick Bridge received: $letter")
                 val blocks = pendingAutoClickBlocks
                 pendingAutoClickBlocks = null
                 mainHandler.post {
@@ -759,6 +807,9 @@ class OverlayService : Service() {
             setWindowFocusable(true)
             try { windowManager.updateViewLayout(winView, windowParams) } catch (_: Exception) {}
 
+            // Resume webview execution when window becomes visible
+            geminiWebView?.onResume()
+
             // Spring Pop In Animation
             winView.scaleX = 0.85f
             winView.scaleY = 0.85f
@@ -785,6 +836,7 @@ class OverlayService : Service() {
                     windowParams.y = -5000
                     setWindowFocusable(false)
                     try { windowManager.updateViewLayout(winView, windowParams) } catch (_: Exception) {}
+                    // DO NOT call onPause() - keeping WebView active preserves persistent Gemini web session!
                 }
                 .start()
         }
@@ -924,7 +976,7 @@ class OverlayService : Service() {
 
                 bitmapToRecycle?.recycle()
 
-                // 5. Prompt for single-letter answer resolution
+                // 5. Strict single-letter answer prompt formulation
                 val promptText = "CRITICAL INSTRUCTION: You are an expert MCQ Solver. Read the question and the choices below. Identify the single correct option letter (A, B, C, or D).\nSTRICT RULE: Reply ONLY with 'CORRECT_OPTION: X' where X is strictly one letter A, B, C, or D. Do not write any explanations, markdown or greetings.\n\n$extractedText"
 
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -933,7 +985,6 @@ class OverlayService : Service() {
                 // 6. Inject into Gemini Web and activate response watcher
                 btnWindowScan?.text = "✨ Solving..."
                 withContext(Dispatchers.Main) {
-                    delay(150)
                     if (autoClickMode) {
                         pendingAutoClickBlocks = textBlocks
                     } else {
@@ -1011,11 +1062,17 @@ class OverlayService : Service() {
                         try { el.focus(); } catch(_) {}
                     }
 
-                    // 1. Focus rich-textarea
+                    // 1. Tag all PREVIOUS response turns as old so they can NEVER be read for the current question
+                    let oldElements = document.querySelectorAll('.model-response-text, .markdown, message-content, [data-test-id="model-turn"], model-response');
+                    for (let i = 0; i < oldElements.length; i++) {
+                        oldElements[i].setAttribute('data-omni-old', 'true');
+                    }
+
+                    // 2. Focus rich-textarea
                     let richTextarea = document.querySelector('rich-textarea');
                     if (richTextarea) simulateClick(richTextarea);
 
-                    // 2. Find editable input element
+                    // 3. Find editable input element
                     let input = document.querySelector('rich-textarea div[contenteditable="true"]') ||
                                 document.querySelector('rich-textarea p') ||
                                 document.querySelector('div.ql-editor') ||
@@ -1027,12 +1084,6 @@ class OverlayService : Service() {
                     if (!input) return "INPUT_NOT_FOUND";
 
                     simulateClick(input);
-
-                    // 3. Count existing model response turns BEFORE submitting prompt
-                    // This is essential to prevent reading stale answers from previous questions!
-                    let existingResponses = document.querySelectorAll('.model-response-text, .markdown, message-content, [data-test-id="model-turn"]');
-                    let initialResponseCount = existingResponses.length;
-                    let lastOldText = initialResponseCount > 0 ? (existingResponses[initialResponseCount - 1].textContent || "").trim() : "";
 
                     // 4. Insert prompt
                     if (input.tagName && (input.tagName.toLowerCase() === 'textarea' || input.tagName.toLowerCase() === 'input')) {
@@ -1081,8 +1132,8 @@ class OverlayService : Service() {
                         if (sendBtn && !sendBtn.disabled && sendBtn.getAttribute('aria-disabled') !== 'true') {
                             clearInterval(sendTimer);
                             simulateClick(sendBtn);
-                            startResponseObserver(initialResponseCount, lastOldText);
-                        } else if (attempts >= 15) {
+                            startResponseObserver();
+                        } else if (attempts >= 12) {
                             clearInterval(sendTimer);
                             try {
                                 let enterEvt = new KeyboardEvent('keydown', {
@@ -1091,35 +1142,40 @@ class OverlayService : Service() {
                                 input.dispatchEvent(enterEvt);
                             } catch(_) {}
                             if (sendBtn) simulateClick(sendBtn);
-                            startResponseObserver(initialResponseCount, lastOldText);
+                            startResponseObserver();
                         }
                     }, 100);
 
-                    // 6. Response Observer that only inspects the NEW turn created for this question
-                    function startResponseObserver(initialCount, oldText) {
+                    // 6. Response Observer: inspects ONLY newly created turns (ignoring old ones)
+                    function startResponseObserver() {
+                        if (window._omniPollInterval) {
+                            clearInterval(window._omniPollInterval);
+                            window._omniPollInterval = null;
+                        }
+                        window._omniAnswerDelivered = false;
+
                         let pollCount = 0;
                         let pollInterval = setInterval(function() {
                             pollCount++;
-                            let responseElements = document.querySelectorAll('.model-response-text, .markdown, message-content, [data-test-id="model-turn"]');
-                            let currentCount = responseElements.length;
-                            
-                            let targetElement = null;
-                            if (currentCount > initialCount) {
-                                targetElement = responseElements[currentCount - 1];
-                            } else if (currentCount === initialCount && initialCount > 0) {
-                                let candidate = responseElements[initialCount - 1];
-                                let candText = (candidate.textContent || "").trim();
-                                if (candText !== oldText && candText.length > 0) {
-                                    targetElement = candidate;
+                            let allResponses = document.querySelectorAll('.model-response-text, .markdown, message-content, [data-test-id="model-turn"]');
+                            let newResponses = [];
+                            for (let i = 0; i < allResponses.length; i++) {
+                                let el = allResponses[i];
+                                if (el.getAttribute('data-omni-old') !== 'true' && !el.closest('[data-omni-old="true"]')) {
+                                    newResponses.push(el);
                                 }
                             }
 
                             // If Gemini hasn't mounted the new response element yet, keep waiting!
-                            if (!targetElement) {
-                                if (pollCount > 100) clearInterval(pollInterval);
+                            if (newResponses.length === 0) {
+                                if (pollCount > 90) {
+                                    clearInterval(pollInterval);
+                                    window._omniPollInterval = null;
+                                }
                                 return;
                             }
 
+                            let targetElement = newResponses[newResponses.length - 1];
                             let text = (targetElement.textContent || "").trim();
                             if (!text || text.length === 0) return;
 
@@ -1129,20 +1185,29 @@ class OverlayService : Service() {
                             // Strict matching first
                             let match = text.match(/CORRECT_OPTION:\s*\(?([A-D])\)?/i);
                             if (!match) match = text.match(/ANSWER:\s*\(?([A-D])\)?/i);
+                            if (!match) match = text.match(/Option\s*\(?([A-D])\)?\s*(?:is\s*(?:the\s*)?correct|is\s*right)/i);
                             if (!match) match = text.match(/Correct\s*(?:Option|Answer)[:\s]*\(?([A-D])\)?/i);
                             if (!match) match = text.match(/\b([A-D])\s+is\s+(?:the\s+)?correct\s+(?:option|answer|choice)\b/i);
-                            if (!match) match = text.match(/Option\s*\(?([A-D])\)?\s*(?:is\s*(?:the\s*)?correct|is\s*right)/i);
 
-                            // While streaming, only accept when strict pattern is formed
+                            // While streaming, wait until strict pattern is formed
                             if (!match && isStreaming) {
                                 return;
+                            }
+
+                            // Fallback after generation is completely finished (Stop button gone)
+                            if (!match && !isStreaming && pollCount > 6) {
+                                match = text.match(/(?:therefore|hence|so|answer is|option)\s*\(?([A-D])\)?/i) ||
+                                        text.match(/\b([A-D])\b(?=[^A-D]*$)/) ||
+                                        text.match(/^\s*\(?([A-D])\)?(?:\.|\:|\s|$)/m);
                             }
 
                             if (match && match[1]) {
                                 let letter = match[1].toUpperCase();
                                 if (['A', 'B', 'C', 'D'].indexOf(letter) !== -1) {
                                     clearInterval(pollInterval);
-                                    if (window.AndroidBridge) {
+                                    window._omniPollInterval = null;
+                                    if (!window._omniAnswerDelivered && window.AndroidBridge) {
+                                        window._omniAnswerDelivered = true;
                                         if ($isAutoClick) {
                                             window.AndroidBridge.onAutoClickAnswer(letter);
                                         } else {
@@ -1153,30 +1218,13 @@ class OverlayService : Service() {
                                 }
                             }
 
-                            // Fallback after generation is completely finished (Stop button gone)
-                            if (!isStreaming && pollCount > 12) {
-                                let endMatch = text.match(/(?:therefore|hence|so|answer is|option)\s*\(?([A-D])\)?/i) ||
-                                               text.match(/\b([A-D])\b(?=[^A-D]*$)/);
-                                if (endMatch && endMatch[1]) {
-                                    let letter = endMatch[1].toUpperCase();
-                                    if (['A', 'B', 'C', 'D'].indexOf(letter) !== -1) {
-                                        clearInterval(pollInterval);
-                                        if (window.AndroidBridge) {
-                                            if ($isAutoClick) {
-                                                window.AndroidBridge.onAutoClickAnswer(letter);
-                                            } else {
-                                                window.AndroidBridge.onAnswerResolved(letter);
-                                            }
-                                        }
-                                        return;
-                                    }
-                                }
-                            }
-
-                            if (pollCount > 100) { // 20s timeout
+                            if (pollCount > 90) { // ~13s timeout
                                 clearInterval(pollInterval);
+                                window._omniPollInterval = null;
                             }
-                        }, 200);
+                        }, 150);
+
+                        window._omniPollInterval = pollInterval;
                     }
 
                     return "SUCCESS";
@@ -1280,21 +1328,32 @@ class OverlayService : Service() {
                 getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
             } ?: return
 
-            // Timings pattern: [delay, pulse, pause, pulse, pause, ...]
-            val timings = mutableListOf<Long>(0)
-            val pulseMs = 110L
-            val pauseMs = 130L
-            for (i in 0 until pulseCount) {
-                timings.add(pulseMs)
-                if (i < pulseCount - 1) {
-                    timings.add(pauseMs)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Crisp modern haptic composition
+                val composition = VibrationEffect.startComposition()
+                for (i in 0 until pulseCount) {
+                    composition.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.9f, 0)
+                    if (i < pulseCount - 1) {
+                        composition.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 110)
+                    }
                 }
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(composition.compose())
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val timings = mutableListOf<Long>(0)
+                val pulseMs = 80L
+                val pauseMs = 120L
+                for (i in 0 until pulseCount) {
+                    timings.add(pulseMs)
+                    if (i < pulseCount - 1) timings.add(pauseMs)
+                }
                 val effect = VibrationEffect.createWaveform(timings.toLongArray(), -1)
                 vibrator.vibrate(effect)
             } else {
+                val timings = mutableListOf<Long>(0)
+                for (i in 0 until pulseCount) {
+                    timings.add(80L)
+                    if (i < pulseCount - 1) timings.add(120L)
+                }
                 @Suppress("DEPRECATION")
                 vibrator.vibrate(timings.toLongArray(), -1)
             }
@@ -1342,42 +1401,92 @@ class OverlayService : Service() {
     }
 
     /**
+     * Intelligently locates the option on screen corresponding to the answer letter (A, B, C, D).
+     * Handles:
+     * - Standard letters: "(A)", "A.", "A)", "[A]", "Option A"
+     * - Numeric options: "(1)", "1.", "1)", "[1]", "Option 1" (where A=1, B=2, C=3, D=4)
+     * - Cluster analysis: Identifies the group of 4 options vertically aligned, avoiding false matches in browser chrome.
+     */
+    private fun findOptionTargetRect(targetLetter: String, textBlocks: List<Pair<String, Rect>>): Rect? {
+        val letter = targetLetter.uppercase().trim()
+        val numStr = when (letter) { "A" -> "1"; "B" -> "2"; "C" -> "3"; "D" -> "4"; else -> "" }
+
+        val allLetters = listOf("A", "B", "C", "D")
+        val allNumbers = listOf("1", "2", "3", "4")
+
+        // Screen geometry cutoffs to avoid top browser bar and bottom system bar
+        val displayMetrics = resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val topCutoff = (screenHeight * 0.08).toInt()
+
+        // Filter out blocks in top 8% of screen (browser URL bar area)
+        val validBlocks = textBlocks.filter { it.second.top >= topCutoff }
+
+        fun getCandidates(keys: List<String>): Map<String, List<Rect>> {
+            val map = mutableMapOf<String, MutableList<Rect>>()
+            for (k in keys) map[k] = mutableListOf()
+
+            for (block in validBlocks) {
+                val t = block.first.trim()
+                for (k in keys) {
+                    val isMatch = t.matches(Regex("""^\s*\(?${k}\s*[.)\]:-].*""", RegexOption.IGNORE_CASE)) ||
+                                  t.matches(Regex("""^\s*Option\s*${k}\b.*""", RegexOption.IGNORE_CASE)) ||
+                                  t.matches(Regex("""^\s*\(?${k}\)?\s*$""", RegexOption.IGNORE_CASE))
+                    if (isMatch) {
+                        map[k]?.add(block.second)
+                    }
+                }
+            }
+            return map
+        }
+
+        val letterMap = getCandidates(allLetters)
+        val numberMap = if (numStr.isNotEmpty()) getCandidates(allNumbers) else emptyMap()
+
+        val letterCount = allLetters.count { (letterMap[it]?.size ?: 0) > 0 }
+        val numberCount = allNumbers.count { (numberMap[it]?.size ?: 0) > 0 }
+
+        val useNumbers = (numberCount > letterCount && numberCount >= 2)
+        val activeMap = if (useNumbers) numberMap else letterMap
+        val activeKey = if (useNumbers) numStr else letter
+
+        val candidates = activeMap[activeKey] ?: emptyList()
+        if (candidates.isNotEmpty()) {
+            if (candidates.size == 1) return candidates.first()
+
+            // When multiple candidates exist, pick the one vertically aligned with the option cluster
+            val otherCandidates = activeMap.filter { it.key != activeKey }.values.flatten()
+            if (otherCandidates.isNotEmpty()) {
+                val avgX = otherCandidates.map { it.left }.average()
+                return candidates.minByOrNull { Math.abs(it.left - avgX) } ?: candidates.first()
+            }
+            return candidates.first()
+        }
+
+        // Secondary fallback: "Option X" anywhere in valid text
+        for (block in validBlocks) {
+            val t = block.first.trim()
+            if (t.contains(Regex("""\bOption\s*${letter}\b""", RegexOption.IGNORE_CASE))) {
+                return block.second
+            }
+        }
+
+        // Tertiary fallback: Starts with letter on its own
+        for (block in validBlocks) {
+            val t = block.first.trim()
+            if (t.matches(Regex("""^${letter}\b.*""", RegexOption.IGNORE_CASE))) {
+                return block.second
+            }
+        }
+
+        return null
+    }
+
+    /**
      * Find the bounding box for the correct answer option and tap it via AccessibilityService.
      */
     private fun performAutoClick(answerLetter: String, textBlocks: List<Pair<String, Rect>>) {
-        val exactStartPattern = Regex("""^\s*\(?${answerLetter}[.)\s:]""", RegexOption.IGNORE_CASE)
-        val optionWordPattern = Regex("""\bOption\s*${answerLetter}\b""", RegexOption.IGNORE_CASE)
-        val wordBoundPattern = Regex("""\b${answerLetter}[.)]""", RegexOption.IGNORE_CASE)
-
-        var targetRect: Rect? = null
-        // 1. Try exact line start first (most accurate for options like "D. Berlin")
-        for (block in textBlocks) {
-            if (exactStartPattern.containsMatchIn(block.first)) {
-                targetRect = block.second
-                Log.d(TAG, "Found exact option $answerLetter at rect: $targetRect, text: ${block.first.take(50)}")
-                break
-            }
-        }
-        // 2. Try "Option D" pattern
-        if (targetRect == null) {
-            for (block in textBlocks) {
-                if (optionWordPattern.containsMatchIn(block.first)) {
-                    targetRect = block.second
-                    Log.d(TAG, "Found 'Option $answerLetter' at rect: $targetRect, text: ${block.first.take(50)}")
-                    break
-                }
-            }
-        }
-        // 3. Try word bound pattern
-        if (targetRect == null) {
-            for (block in textBlocks) {
-                if (wordBoundPattern.containsMatchIn(block.first)) {
-                    targetRect = block.second
-                    Log.d(TAG, "Found word bound $answerLetter at rect: $targetRect, text: ${block.first.take(50)}")
-                    break
-                }
-            }
-        }
+        val targetRect = findOptionTargetRect(answerLetter, textBlocks)
 
         if (targetRect == null) {
             Log.w(TAG, "Could not locate option $answerLetter on screen — text blocks: ${textBlocks.size}")
@@ -1387,23 +1496,25 @@ class OverlayService : Service() {
         }
 
         serviceScope.launch {
-            // Anti-Cheat: Emulate realistic human reading delay (1.4s to 3.2s)
-            if (isAntiCheatEnabled) {
-                val humanThinkingDelay = 1400L + kotlin.random.Random.nextLong(1800L)
-                Log.d(TAG, "Anti-Cheat thinking delay: ${humanThinkingDelay}ms before clicking option $answerLetter")
-                delay(humanThinkingDelay)
+            // Natural human delay: 350ms - 650ms if anti-cheat, 50ms otherwise
+            val readingDelay = if (isAntiCheatEnabled) {
+                350L + kotlin.random.Random.nextLong(300L)
+            } else {
+                50L
             }
+            delay(readingDelay)
 
-            // Anti-Cheat: Gaussian coordinate jitter within inner 40% of option box (avoids dead-center bot detection)
-            val rectW = targetRect.width().toFloat()
-            val rectH = targetRect.height().toFloat()
-            val jitterX = if (isAntiCheatEnabled) (kotlin.random.Random.nextFloat() * 0.4f - 0.2f) * rectW else 0f
-            val jitterY = if (isAntiCheatEnabled) (kotlin.random.Random.nextFloat() * 0.4f - 0.2f) * rectH else 0f
-            val clickX = (targetRect.centerX() + jitterX).coerceIn(targetRect.left + 8f, targetRect.right - 8f)
-            val clickY = (targetRect.centerY() + jitterY).coerceIn(targetRect.top + 8f, targetRect.bottom - 8f)
+            // Click coordinate calculation:
+            // For wide blocks (full question option row), the radio button/checkbox circle is on the left side (~24dp in).
+            // For narrow badges (a circular button or letter badge), use horizontal center.
+            val clickX = if (targetRect.width() > dpToPx(70)) {
+                (targetRect.left + dpToPx(24).toFloat()).coerceIn(targetRect.left + 4f, targetRect.right - 4f)
+            } else {
+                targetRect.centerX().toFloat()
+            }
+            val clickY = targetRect.centerY().toFloat()
 
-            Log.d(TAG, "Auto-clicking at ($clickX, $clickY) for option $answerLetter (antiCheat=$isAntiCheatEnabled)")
-
+            Log.d(TAG, "Auto-clicking option $answerLetter at ($clickX, $clickY) [rect=$targetRect]")
             val clicked = AutoClickAccessibilityService.performClick(clickX, clickY, antiCheat = isAntiCheatEnabled)
             withContext(Dispatchers.Main) {
                 if (clicked) {
@@ -1414,81 +1525,71 @@ class OverlayService : Service() {
                 }
             }
 
-            // ─── AEI AFK Hands-Free Auto-Advance ("Save & Next" / "Next") ─────────
+            // AEI AFK Hands-Free Auto-Advance ("Save & Next" / "Submit" / "Next")
             if (clicked && isAfkAutoAdvanceEnabled) {
                 val delayTime = if (isAntiCheatEnabled) {
-                    (nextDelayMs + kotlin.random.Random.nextLong(400L) - 200L).coerceAtLeast(400L)
+                    (nextDelayMs + kotlin.random.Random.nextLong(300L) - 150L).coerceAtLeast(300L)
                 } else {
                     nextDelayMs
                 }
-                Log.d(TAG, "AEI AFK Bot: Waiting ${delayTime}ms before advancing to Next...")
                 delay(delayTime)
 
                 val nextRect = findNextButtonRect(textBlocks)
                 if (nextRect != null) {
-                    val nW = nextRect.width().toFloat()
-                    val nH = nextRect.height().toFloat()
-                    val nJitterX = if (isAntiCheatEnabled) (kotlin.random.Random.nextFloat() * 0.3f - 0.15f) * nW else 0f
-                    val nJitterY = if (isAntiCheatEnabled) (kotlin.random.Random.nextFloat() * 0.3f - 0.15f) * nH else 0f
-                    val nextClickX = (nextRect.centerX() + nJitterX).coerceIn(nextRect.left + 6f, nextRect.right - 6f)
-                    val nextClickY = (nextRect.centerY() + nJitterY).coerceIn(nextRect.top + 6f, nextRect.bottom - 6f)
-
-                    Log.d(TAG, "AEI AFK Bot: Auto-advancing via Next button at ($nextClickX, $nextClickY)")
+                    val nextClickX = nextRect.centerX().toFloat()
+                    val nextClickY = nextRect.centerY().toFloat()
+                    Log.d(TAG, "AEI AFK Bot: Auto-advancing via button at ($nextClickX, $nextClickY)")
                     val nextClicked = AutoClickAccessibilityService.performClick(nextClickX, nextClickY, antiCheat = isAntiCheatEnabled)
                     withContext(Dispatchers.Main) {
                         if (nextClicked) {
-                            Toast.makeText(this@OverlayService, "🤖 AEI AFK: Auto-Advanced to Next ⏩", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@OverlayService, "🤖 Auto-Advanced ⏩", Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
-                    Log.d(TAG, "AEI AFK Bot: Next button not found on screen. Waiting for screen transition.")
+                    Log.d(TAG, "AEI AFK Bot: Next/Submit button not found on screen.")
                 }
             }
         }
     }
 
     /**
-     * Find "Save & Next", "Next Question", "Next", "Continue" button on screen.
+     * Find "Save & Next", "Next Question", "Submit", "Continue" button on screen.
      * Excludes final destructive actions like "Finish Exam", "Submit Test".
      */
     private fun findNextButtonRect(textBlocks: List<Pair<String, Rect>>): Rect? {
-        val excludePattern = Regex("""\b(Finish|End|Cancel|Exit|Quit|Close|Previous|Prev|Back)\b""", RegexOption.IGNORE_CASE)
-        val priority1 = Regex("""\bSave\s*(?:&|and)\s*Next\b""", RegexOption.IGNORE_CASE)
-        val priority2 = Regex("""\b(?:Next\s*Question|Submit\s*(?:&|and)\s*Next)\b""", RegexOption.IGNORE_CASE)
-        val priority3 = Regex("""^\s*Next\s*$""", RegexOption.IGNORE_CASE)
-        val priority4 = Regex("""\b(?:Next|Continue|Proceed)\b""", RegexOption.IGNORE_CASE)
+        val excludePattern = Regex("""\b(Finish\s*Test|Finish\s*Exam|End\s*Test|End\s*Exam|Exit|Quit|Cancel|Close|Previous|Prev|Back)\b""", RegexOption.IGNORE_CASE)
 
-        // 1. High-priority "Save & Next" (TCS iON, NTA, HackerRank, etc.)
-        for (block in textBlocks) {
-            if (excludePattern.containsMatchIn(block.first)) continue
-            if (priority1.containsMatchIn(block.first)) {
-                Log.d(TAG, "Found Save & Next button: '${block.first}' at ${block.second}")
-                return block.second
-            }
+        val p1 = Regex("""\bSave\s*(?:&|and)\s*(?:Next|Continue)\b""", RegexOption.IGNORE_CASE)
+        val p2 = Regex("""\b(?:Next\s*Question|Submit\s*(?:&|and)\s*Next|Submit\s*Answer)\b""", RegexOption.IGNORE_CASE)
+        val p3 = Regex("""^\s*(?:Next|Submit|Continue|Proceed|Confirm)\s*[$>→»]?\s*$""", RegexOption.IGNORE_CASE)
+        val p4 = Regex("""\b(?:Next|Submit|Continue|Proceed)\b""", RegexOption.IGNORE_CASE)
+        val p5 = Regex("""^[>→»]$""")
+
+        val screenHeight = resources.displayMetrics.heightPixels
+
+        // Prioritize bottom-half of screen where navigation/submit buttons reside
+        val candidateBlocks = textBlocks.filter { !excludePattern.containsMatchIn(it.first) }
+            .sortedByDescending { it.second.top }
+
+        // 1. High-priority "Save & Next" / "Save & Continue"
+        for (block in candidateBlocks) {
+            if (p1.containsMatchIn(block.first)) return block.second
         }
-        // 2. "Next Question" or "Submit & Next"
-        for (block in textBlocks) {
-            if (excludePattern.containsMatchIn(block.first)) continue
-            if (priority2.containsMatchIn(block.first)) {
-                Log.d(TAG, "Found Next Question button: '${block.first}' at ${block.second}")
-                return block.second
-            }
+        // 2. "Next Question" / "Submit & Next" / "Submit Answer"
+        for (block in candidateBlocks) {
+            if (p2.containsMatchIn(block.first)) return block.second
         }
-        // 3. Exact "Next"
-        for (block in textBlocks) {
-            if (excludePattern.containsMatchIn(block.first)) continue
-            if (priority3.containsMatchIn(block.first)) {
-                Log.d(TAG, "Found exact Next button: '${block.first}' at ${block.second}")
-                return block.second
-            }
+        // 3. Exact "Next" / "Submit" / "Continue"
+        for (block in candidateBlocks) {
+            if (p3.containsMatchIn(block.first)) return block.second
         }
-        // 4. "Next / Continue / Proceed"
-        for (block in textBlocks) {
-            if (excludePattern.containsMatchIn(block.first)) continue
-            if (priority4.containsMatchIn(block.first)) {
-                Log.d(TAG, "Found Continue/Proceed button: '${block.first}' at ${block.second}")
-                return block.second
-            }
+        // 4. Any words containing Next / Submit / Continue
+        for (block in candidateBlocks) {
+            if (p4.containsMatchIn(block.first)) return block.second
+        }
+        // 5. Arrow icon symbols (>, →, ») near bottom
+        for (block in candidateBlocks) {
+            if (p5.matches(block.first.trim()) && block.second.top > screenHeight * 0.45) return block.second
         }
         return null
     }
@@ -1555,8 +1656,6 @@ class OverlayService : Service() {
         }
     }
 
-    private var isGhostMode = false
-
     private fun createDragAndTapListener(
         params: WindowManager.LayoutParams,
         viewProvider: () -> View?,
@@ -1602,7 +1701,8 @@ class OverlayService : Service() {
                         if (Math.abs(totalDx) > 8 || Math.abs(totalDy) > 8) dragging = true
 
                         params.x = startX + totalDx
-                        params.y = startY + totalDy
+                        val safeMinY = getStatusBarHeight()
+                        params.y = (startY + totalDy).coerceAtLeast(safeMinY)
                         try {
                             viewProvider()?.let { windowManager.updateViewLayout(it, params) }
                         } catch (_: Exception) {}
@@ -1619,6 +1719,22 @@ class OverlayService : Service() {
                         }
                     }
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        // Drag-to-dismiss check: if dragged to the bottom 10% of screen, minimize overlay
+                        val screenH = resources.displayMetrics.heightPixels
+                        if (dragging && params.y > (screenH * 0.88)) {
+                            targetView?.animate()
+                                ?.scaleX(0f)
+                                ?.scaleY(0f)
+                                ?.alpha(0f)
+                                ?.setDuration(240)
+                                ?.withEndAction {
+                                    stopSelf()
+                                }
+                                ?.start()
+                            Toast.makeText(this@OverlayService, "👋 OmniSolve Closed", Toast.LENGTH_SHORT).show()
+                            return true
+                        }
+
                         // Decaying Elastic Wobble Spring Rebound upon finger release
                         targetView?.animate()
                             ?.scaleX(1.0f)
@@ -1702,6 +1818,11 @@ class OverlayService : Service() {
 
     private fun dpToPx(dp: Int): Int =
         (dp * resources.displayMetrics.density).toInt()
+
+    private fun getStatusBarHeight(): Int {
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else dpToPx(36)
+    }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

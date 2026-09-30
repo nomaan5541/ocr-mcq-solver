@@ -50,26 +50,63 @@ class OcrEngine {
      */
     suspend fun extractTextWithBounds(bitmap: Bitmap): Pair<String, List<Pair<String, Rect>>> {
         return try {
-            val inputImage = InputImage.fromBitmap(bitmap, 0)
+            // Memory & Speed optimization: downscale 2x for OCR inference if large screen bitmap
+            val scaleFactor = if (bitmap.width > 1200 || bitmap.height > 1200) 0.5f else 1.0f
+            val scaledBitmap = if (scaleFactor < 1.0f) {
+                Bitmap.createScaledBitmap(
+                    bitmap,
+                    (bitmap.width * scaleFactor).toInt(),
+                    (bitmap.height * scaleFactor).toInt(),
+                    true
+                )
+            } else {
+                bitmap
+            }
+
+            val inputImage = InputImage.fromBitmap(scaledBitmap, 0)
             val result = recognizer.process(inputImage).await()
+
+            // If we created a temporary downscaled bitmap, recycle it
+            if (scaledBitmap != bitmap) {
+                scaledBitmap.recycle()
+            }
+
             val fullText = result.text.trim()
-            Log.d(TAG, "OCR extracted ${fullText.length} chars with bounds")
+            Log.d(TAG, "OCR extracted ${fullText.length} chars with bounds (scale=$scaleFactor)")
 
             val blocks = mutableListOf<Pair<String, Rect>>()
+            val invScale = 1.0f / scaleFactor
+
             for (block in result.textBlocks) {
                 // First extract each line so individual options (A, B, C, D) have exact bounds
                 for (line in block.lines) {
                     val lineText = line.text.trim()
                     val lineBounds = line.boundingBox
                     if (lineBounds != null && lineText.isNotBlank()) {
-                        blocks.add(Pair(lineText, lineBounds))
+                        val unscaled = if (scaleFactor < 1.0f) {
+                            Rect(
+                                (lineBounds.left * invScale).toInt(),
+                                (lineBounds.top * invScale).toInt(),
+                                (lineBounds.right * invScale).toInt(),
+                                (lineBounds.bottom * invScale).toInt()
+                            )
+                        } else lineBounds
+                        blocks.add(Pair(lineText, unscaled))
                     }
                 }
                 // Also keep the block-level entry
                 val blockText = block.text.trim()
                 val bounds = block.boundingBox
                 if (bounds != null && blockText.isNotBlank()) {
-                    blocks.add(Pair(blockText, bounds))
+                    val unscaled = if (scaleFactor < 1.0f) {
+                        Rect(
+                            (bounds.left * invScale).toInt(),
+                            (bounds.top * invScale).toInt(),
+                            (bounds.right * invScale).toInt(),
+                            (bounds.bottom * invScale).toInt()
+                        )
+                    } else bounds
+                    blocks.add(Pair(blockText, unscaled))
                 }
             }
 

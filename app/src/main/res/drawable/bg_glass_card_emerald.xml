@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#E60A241A"
-        android:endColor="#E6051710"
-        android:angle="270" />
-    <corners android:radius="22dp" />
-    <stroke
-        android:width="1.5dp"
-        android:color="#6610B981" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Emerald Glass Fill -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#CC0D2E20"
+                android:centerColor="#CC0A2118"
+                android:endColor="#CC081A14"
+                android:angle="270" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+    <!-- Emerald Glow Overlay -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#1510B981"
+                android:endColor="#0510B981"
+                android:angle="270" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+    <!-- Emerald Specular Border -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <stroke
+                android:width="1.2dp"
+                android:color="#5010B981" />
+        </shape>
+    </item>
+</layer-list>

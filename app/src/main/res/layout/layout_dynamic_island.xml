@@ -2,31 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/island_root"
     android:layout_width="wrap_content"
-    android:layout_height="44dp"
+    android:layout_height="46dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:background="@drawable/bg_dynamic_island"
-    android:elevation="14dp"
-    android:paddingStart="8dp"
+    android:elevation="16dp"
+    android:paddingStart="6dp"
     android:paddingEnd="8dp"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
     android:clipToPadding="false"
     android:clipChildren="false">
 
     <!-- Island Leading Icon (Avatar / Battery Icon) -->
     <FrameLayout
         android:id="@+id/island_icon_container"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:background="@drawable/bg_floating_bubble"
         android:clickable="true"
         android:focusable="true">
 
         <ImageView
             android:id="@+id/iv_island_icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_virus_avatar"
             android:scaleType="centerCrop" />
@@ -57,16 +57,16 @@
         <TextView
             android:id="@+id/tv_island_answer"
             android:layout_width="wrap_content"
-            android:minWidth="34dp"
-            android:layout_height="32dp"
+            android:minWidth="36dp"
+            android:layout_height="34dp"
             android:layout_marginStart="8dp"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:background="@drawable/bg_answer_box"
             android:gravity="center"
             android:text="?"
             android:textColor="#10B981"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -84,8 +84,8 @@
         <!-- Scan / Play Action -->
         <FrameLayout
             android:id="@+id/btn_island_scan"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:layout_marginStart="4dp"
             android:background="@drawable/bg_scan_button"
             android:clickable="true"
@@ -103,34 +103,52 @@
         <!-- Toggle Gemini Window -->
         <ImageView
             android:id="@+id/btn_island_toggle_window"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:layout_marginStart="6dp"
-            android:padding="5dp"
+            android:padding="6dp"
             android:background="@drawable/bg_chip_action"
             android:src="@android:drawable/ic_menu_view"
-            android:tint="#38BDF8"
+            android:tint="#00D4FF"
             android:clickable="true"
             android:focusable="true" />
 
         <!-- Bot Toggle Button -->
         <ImageView
             android:id="@+id/btn_island_bot_toggle"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:layout_marginStart="6dp"
-            android:padding="5dp"
+            android:padding="6dp"
             android:background="@drawable/bg_chip_action"
             android:src="@android:drawable/ic_menu_myplaces"
             android:tint="#64748B"
             android:clickable="true"
             android:focusable="true" />
 
+        <!-- Opacity / Visibility Toggle Button (100% -> 90% -> 50% -> 25%) -->
+        <TextView
+            android:id="@+id/btn_island_opacity"
+            android:layout_width="wrap_content"
+            android:minWidth="34dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp"
+            android:gravity="center"
+            android:background="@drawable/bg_chip_action"
+            android:text="👁 100%"
+            android:textColor="#38BDF8"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
         <!-- Close / Minimize Tray Button -->
         <ImageView
             android:id="@+id/btn_island_close"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginStart="6dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:tint="#8E9BB0"

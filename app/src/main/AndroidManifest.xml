@@ -9,21 +9,36 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Required for Android 14+ Samsung/Xiaomi/OPPO/Realme/OnePlus OEM layers -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_virus_avatar"
+        android:roundIcon="@drawable/ic_virus_avatar"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.OmniSolveOverlay"
-        tools:targetApi="34">
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true"
+        android:extractNativeLibs="true"
+        android:requestLegacyExternalStorage="true"
+        android:enableOnBackInvokedCallback="true"
+        tools:replace="android:label,android:icon,android:roundIcon,android:theme"
+        tools:targetApi="35">
 
         <!-- Main Launcher Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.OmniSolveOverlay">
+            android:theme="@style/Theme.OmniSolveOverlay"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|density"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -56,6 +71,17 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <!-- OEM App Install Verification Provider (Samsung/OPPO/Realme/OnePlus) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

@@ -173,44 +173,93 @@ class AutoClickAccessibilityService : AccessibilityService() {
         }
 
         val rawBlocks = mutableListOf<Pair<String, Rect>>()
+        val displayMetrics = resources.displayMetrics
+        val topBrowserBarThresholdPx = (90 * displayMetrics.density).toInt()
 
-        fun traverse(node: AccessibilityNodeInfo?) {
-            if (node == null) return
+        fun isBrowserChromeNode(node: AccessibilityNodeInfo, bounds: Rect): Boolean {
+            val pkg = node.packageName?.toString()?.lowercase() ?: ""
+            val isBrowser = pkg.contains("chrome") || pkg.contains("browser") ||
+                    pkg.contains("firefox") || pkg.contains("opera") ||
+                    pkg.contains("brave") || pkg.contains("edge") ||
+                    pkg.contains("sbrowser")
+
+            val viewId = node.viewIdResourceName?.lowercase() ?: ""
+            val desc = node.contentDescription?.toString()?.lowercase() ?: ""
+            val text = node.text?.toString()?.lowercase() ?: ""
+
+            // Explicit browser navigation/search IDs
+            if (viewId.contains("url_bar") || viewId.contains("location_bar") ||
+                viewId.contains("search_box") || viewId.contains("omnibox") ||
+                viewId.contains("toolbar") || viewId.contains("address_bar") ||
+                viewId.contains("tab_switcher") || viewId.contains("menu_button") ||
+                viewId.contains("home_button") || viewId.contains("action_bar_root") ||
+                viewId.contains("control_container")
+            ) {
+                return true
+            }
+
+            // Common browser UI strings
+            if (desc.contains("search or type") || desc.contains("address and search") ||
+                desc.contains("search google") || desc.contains("more options") ||
+                desc.contains("open tabs") || desc.contains("new tab") ||
+                text.contains("search or type") || text.contains("address and search")
+            ) {
+                return true
+            }
+
+            // In browsers, an EditText or TextView at the very top bar is the search/URL bar
+            if (isBrowser && bounds.top < topBrowserBarThresholdPx &&
+                (node.className?.toString()?.contains("EditText") == true || viewId.contains("search") || desc.contains("search"))
+            ) {
+                return true
+            }
+
+            return false
+        }
+
+        fun traverse(node: AccessibilityNodeInfo?, depth: Int = 0) {
+            if (node == null || depth > 16) return
 
             // Skip OmniSolve's own overlay windows/views
             if (node.packageName != null && node.packageName.toString() == packageName) {
                 return
             }
 
-            if (node.isVisibleToUser) {
-                val text = node.text?.toString()?.trim()
-                val desc = node.contentDescription?.toString()?.trim()
-                val effectiveText = when {
-                    !text.isNullOrBlank() -> text
-                    !desc.isNullOrBlank() -> desc
-                    else -> null
-                }
+            if (!node.isVisibleToUser) {
+                return
+            }
 
-                if (!effectiveText.isNullOrBlank()) {
-                    val bounds = Rect()
-                    node.getBoundsInScreen(bounds)
-                    if (bounds.width() > 0 && bounds.height() > 0) {
-                        rawBlocks.add(Pair(effectiveText, bounds))
-                    }
-                }
+            val bounds = Rect()
+            node.getBoundsInScreen(bounds)
+
+            // Skip browser chrome (address bar, search icon, tabs)
+            if (bounds.width() > 0 && bounds.height() > 0 && isBrowserChromeNode(node, bounds)) {
+                return
+            }
+
+            val text = node.text?.toString()?.trim()
+            val desc = node.contentDescription?.toString()?.trim()
+            val effectiveText = when {
+                !text.isNullOrBlank() -> text
+                !desc.isNullOrBlank() -> desc
+                else -> null
+            }
+
+            if (!effectiveText.isNullOrBlank() && bounds.width() > 0 && bounds.height() > 0) {
+                rawBlocks.add(Pair(effectiveText, bounds))
             }
 
             val count = node.childCount
             for (i in 0 until count) {
                 try {
                     val child = node.getChild(i)
-                    traverse(child)
+                    traverse(child, depth + 1)
                 } catch (_: Exception) {}
             }
         }
 
         try {
-            traverse(root)
+            traverse(root, 0)
         } catch (e: Exception) {
             Log.e(TAG, "Error traversing accessibility tree: ${e.message}", e)
         }

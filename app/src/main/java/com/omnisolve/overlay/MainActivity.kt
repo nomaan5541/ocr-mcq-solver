@@ -22,6 +22,9 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.omnisolve.overlay.service.AutoClickAccessibilityService
 import com.omnisolve.overlay.service.OverlayService
 
@@ -90,6 +93,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvAccessibilityStatus: TextView
     private lateinit var btnOpenAccessibility: Button
 
+    // Dynamic Island Recommended Presets
+    private lateinit var btnPresetExam: Button
+    private lateinit var btnPresetTurbo: Button
+    private lateinit var btnPresetStealth: Button
+    private lateinit var tvActivePreset: TextView
+
+    // Dynamic Island Visibility Controls (100%, 90%, 50%, 25%)
+    private lateinit var tvIslandVisibilityTag: TextView
+    private lateinit var btnVis100: Button
+    private lateinit var btnVis90: Button
+    private lateinit var btnVis50: Button
+    private lateinit var btnVis25: Button
+    private var currentIslandOpacityIndex = 0
+
     private var isOverlayRunning = false
     private val prefs by lazy { getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE) }
 
@@ -154,6 +171,28 @@ class MainActivity : AppCompatActivity() {
         sbNextDelay = findViewById(R.id.sb_next_delay)
         tvAccessibilityStatus = findViewById(R.id.tv_accessibility_status)
         btnOpenAccessibility = findViewById(R.id.btn_open_accessibility)
+
+        // Dynamic Island Recommended Presets
+        btnPresetExam = findViewById(R.id.btn_preset_exam)
+        btnPresetTurbo = findViewById(R.id.btn_preset_turbo)
+        btnPresetStealth = findViewById(R.id.btn_preset_stealth)
+        tvActivePreset = findViewById(R.id.tv_active_preset)
+
+        // Dynamic Island Visibility Controls (100%, 90%, 50%, 25%)
+        tvIslandVisibilityTag = findViewById(R.id.tv_island_visibility_tag)
+        btnVis100 = findViewById(R.id.btn_vis_100)
+        btnVis90 = findViewById(R.id.btn_vis_90)
+        btnVis50 = findViewById(R.id.btn_vis_50)
+        btnVis25 = findViewById(R.id.btn_vis_25)
+
+        // ─── Window Insets: Keep layout safely below status/notification bar and above nav bar ───
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot) { view, windowInsets ->
+            val systemBars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            windowInsets
+        }
 
         // ─── 2. Setup Click Listeners ─────────────────────────────────────────
         btnThemeToggle.setOnClickListener {
@@ -236,6 +275,15 @@ class MainActivity : AppCompatActivity() {
             val hud = if (checkedId == R.id.rb_hud_bubble) HUD_STYLE_BUBBLE else HUD_STYLE_ISLAND
             prefs.edit().putString(PREF_KEY_HUD_STYLE, hud).apply()
         }
+
+        // Load saved Island Visibility (100%, 90%, 50%, 25%)
+        val savedOpacityIdx = prefs.getInt("PREF_ISLAND_OPACITY_INDEX", 0).coerceIn(0, 3)
+        updateIslandVisibilityButtons(savedOpacityIdx)
+
+        btnVis100.setOnClickListener { updateIslandVisibilityButtons(0) }
+        btnVis90.setOnClickListener { updateIslandVisibilityButtons(1) }
+        btnVis50.setOnClickListener { updateIslandVisibilityButtons(2) }
+        btnVis25.setOnClickListener { updateIslandVisibilityButtons(3) }
 
         // Load saved Battery Camouflage preference
         swBatteryCamouflage.isChecked = prefs.getBoolean(PREF_KEY_CAMOUFLAGE, false)
@@ -335,7 +383,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         val btnGithub = findViewById<View>(R.id.btn_star_github)
-        applyJellyTouch(btnToggleOverlay, btnThemeToggle, btnProfileAccount, btnLoginGoogle, btnOpenAccessibility, btnGithub)
+        applyJellyTouch(btnToggleOverlay, btnThemeToggle, btnProfileAccount, btnLoginGoogle, btnOpenAccessibility, btnGithub, btnPresetExam, btnPresetTurbo, btnPresetStealth)
+
+        // ─── Dynamic Island Recommended Presets ──────────────────────────────
+        btnPresetExam.setOnClickListener { applyPreset("EXAM") }
+        btnPresetTurbo.setOnClickListener { applyPreset("TURBO") }
+        btnPresetStealth.setOnClickListener { applyPreset("STEALTH") }
 
         // Apply saved theme safely now that all views and components are initialized
         currentThemeMode = prefs.getString(PREF_KEY_THEME_MODE, THEME_DARK) ?: THEME_DARK
@@ -444,6 +497,7 @@ class MainActivity : AppCompatActivity() {
             putExtra(OverlayService.EXTRA_HAPTIC, haptic)
             putExtra(OverlayService.EXTRA_ANTI_CHEAT, antiCheat)
             putExtra(OverlayService.EXTRA_THEME_MODE, currentThemeMode)
+            putExtra(OverlayService.EXTRA_ISLAND_OPACITY_INDEX, currentIslandOpacityIndex)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -456,6 +510,26 @@ class MainActivity : AppCompatActivity() {
         btnToggleOverlay.text = "⏹️ Stop Overlay Service"
         btnToggleOverlay.setBackgroundResource(R.drawable.bg_glass_card)
         Toast.makeText(this, "OmniSolve AI Overlay Active! Open any MCQ app.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun updateIslandVisibilityButtons(selectedIndex: Int) {
+        currentIslandOpacityIndex = selectedIndex.coerceIn(0, 3)
+        prefs.edit().putInt("PREF_ISLAND_OPACITY_INDEX", currentIslandOpacityIndex).apply()
+
+        val buttons = listOf(btnVis100, btnVis90, btnVis50, btnVis25)
+        val tags = listOf("100% OPACITY", "90% OPACITY", "50% OPACITY", "25% OPACITY")
+
+        tvIslandVisibilityTag.text = tags[currentIslandOpacityIndex]
+
+        buttons.forEachIndexed { index, btn ->
+            if (index == currentIslandOpacityIndex) {
+                btn.setBackgroundResource(R.drawable.bg_chip_action)
+                btn.setTextColor(Color.parseColor("#FFFFFF"))
+            } else {
+                btn.setBackgroundResource(R.drawable.bg_glass_chip)
+                btn.setTextColor(Color.parseColor("#94A3B8"))
+            }
+        }
     }
 
     private fun stopOverlayForegroundService() {
@@ -509,7 +583,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (isDark) {
-                mainRoot.setBackgroundColor(Color.parseColor("#070B14"))
+                mainRoot.setBackgroundColor(Color.parseColor("#060910"))
                 headerBar.setBackgroundResource(R.drawable.bg_glass_header)
                 bottomDock.setBackgroundResource(R.drawable.bg_glass_header)
                 btnThemeToggle.setBackgroundResource(R.drawable.bg_glass_profile)
@@ -517,12 +591,19 @@ class MainActivity : AppCompatActivity() {
                     btnProfileAccount.setBackgroundResource(R.drawable.bg_glass_profile)
                 }
                 ivThemeIcon.setImageResource(R.drawable.ic_theme_sun)
-                tvAppTitle.setTextColor(Color.parseColor("#F8FAFC"))
+                tvAppTitle.setTextColor(Color.parseColor("#F0F4FD"))
                 tvAppSubtitle.setTextColor(Color.parseColor("#94A3B8"))
                 tvThemeTag.text = "LIQUID GLASS"
-                tvThemeTag.setTextColor(Color.parseColor("#00F2FE"))
+                tvThemeTag.setTextColor(Color.parseColor("#00D4FF"))
+
+                WindowCompat.getInsetsController(window, window.decorView).apply {
+                    isAppearanceLightStatusBars = false
+                    isAppearanceLightNavigationBars = false
+                }
+                window.statusBarColor = Color.parseColor("#060910")
+                window.navigationBarColor = Color.parseColor("#060910")
             } else {
-                mainRoot.setBackgroundColor(Color.parseColor("#F1F5F9"))
+                mainRoot.setBackgroundColor(Color.parseColor("#F0F4FA"))
                 headerBar.setBackgroundResource(R.drawable.bg_glass_header_light)
                 bottomDock.setBackgroundResource(R.drawable.bg_glass_header_light)
                 btnThemeToggle.setBackgroundResource(R.drawable.bg_glass_profile_light)
@@ -533,7 +614,14 @@ class MainActivity : AppCompatActivity() {
                 tvAppTitle.setTextColor(Color.parseColor("#0F172A"))
                 tvAppSubtitle.setTextColor(Color.parseColor("#475569"))
                 tvThemeTag.text = "CRYSTAL GLASS"
-                tvThemeTag.setTextColor(Color.parseColor("#0284C7"))
+                tvThemeTag.setTextColor(Color.parseColor("#0072FF"))
+
+                WindowCompat.getInsetsController(window, window.decorView).apply {
+                    isAppearanceLightStatusBars = true
+                    isAppearanceLightNavigationBars = true
+                }
+                window.statusBarColor = Color.parseColor("#F0F4FA")
+                window.navigationBarColor = Color.parseColor("#F0F4FA")
             }
 
             applyThemeRecursive(mainRoot, isDark)
@@ -544,13 +632,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyThemeRecursive(view: View, isDark: Boolean) {
         when (view.id) {
-            R.id.card_google_account, R.id.card_engine, R.id.card_hud_style,
+            R.id.card_google_account, R.id.card_engine, R.id.card_hud_style, R.id.card_island_visibility,
             R.id.card_camo, R.id.card_haptics, R.id.card_display_mode,
             R.id.card_permissions -> {
                 view.setBackgroundResource(if (isDark) R.drawable.bg_glass_card else R.drawable.bg_glass_card_light)
             }
             R.id.card_aei_bot -> {
                 view.setBackgroundResource(if (isDark) R.drawable.bg_glass_card_emerald else R.drawable.bg_glass_card_emerald_light)
+            }
+            R.id.card_recommended_presets -> {
+                view.setBackgroundResource(if (isDark) R.drawable.bg_glass_card_accent else R.drawable.bg_glass_card_light)
             }
         }
 
@@ -583,6 +674,104 @@ class MainActivity : AppCompatActivity() {
                 applyThemeRecursive(view.getChildAt(i), isDark)
             }
         }
+    }
+
+    // ─── Dynamic Island Recommended Presets ────────────────────────────────
+
+    private fun applyPreset(preset: String) {
+        val editor = prefs.edit()
+        when (preset) {
+            "EXAM" -> {
+                // 📝 Exam Mode: Balanced speed, Dynamic Island HUD, anti-cheat ON,
+                // auto-click OFF, camouflage ON, 3s scan interval
+                rbHudIsland.isChecked = true
+                editor.putString(PREF_KEY_HUD_STYLE, HUD_STYLE_ISLAND)
+                rbStealthMode.isChecked = true
+                editor.putString(PREF_KEY_DISPLAY_MODE, MODE_STEALTH)
+                swBatteryCamouflage.isChecked = true
+                editor.putBoolean(PREF_KEY_CAMOUFLAGE, true)
+                swHapticFeedback.isChecked = true
+                editor.putBoolean(PREF_KEY_HAPTIC, true)
+                swAntiCheat.isChecked = true
+                editor.putBoolean(PREF_KEY_ANTI_CHEAT, true)
+                swAutoClickBot.isChecked = false
+                editor.putBoolean(PREF_KEY_AUTO_CLICK, false)
+                swAfkMode.isChecked = false
+                editor.putBoolean(PREF_KEY_AFK_MODE, false)
+                swInstantTrigger.isChecked = true
+                editor.putBoolean(PREF_KEY_INSTANT_TRIGGER, true)
+                sbScanInterval.progress = 2 // 3s
+                editor.putInt(PREF_KEY_SCAN_INTERVAL_SEC, 3)
+                updateScanIntervalUI(3)
+                sbNextDelay.progress = 2 // 1.5s
+                editor.putInt(PREF_KEY_NEXT_DELAY_MS, 1500)
+                updateNextDelayUI(1500)
+                rbEngineNative.isChecked = true
+                editor.putString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE)
+                tvActivePreset.text = "Active: 📝 Exam Mode"
+                tvActivePreset.setTextColor(Color.parseColor("#10B981"))
+                Toast.makeText(this, "📝 Exam Mode: Balanced stealth + camouflage", Toast.LENGTH_SHORT).show()
+            }
+            "TURBO" -> {
+                // 🚀 Turbo Mode: Maximum speed, Dynamic Island HUD, auto-click ON,
+                // AFK ON, 1s scan, no camouflage
+                rbHudIsland.isChecked = true
+                editor.putString(PREF_KEY_HUD_STYLE, HUD_STYLE_ISLAND)
+                rbStealthMode.isChecked = true
+                editor.putString(PREF_KEY_DISPLAY_MODE, MODE_STEALTH)
+                swBatteryCamouflage.isChecked = false
+                editor.putBoolean(PREF_KEY_CAMOUFLAGE, false)
+                swHapticFeedback.isChecked = false
+                editor.putBoolean(PREF_KEY_HAPTIC, false)
+                swAntiCheat.isChecked = false
+                editor.putBoolean(PREF_KEY_ANTI_CHEAT, false)
+                swInstantTrigger.isChecked = true
+                editor.putBoolean(PREF_KEY_INSTANT_TRIGGER, true)
+                sbScanInterval.progress = 0 // 1s
+                editor.putInt(PREF_KEY_SCAN_INTERVAL_SEC, 1)
+                updateScanIntervalUI(1)
+                sbNextDelay.progress = 0 // 0.5s
+                editor.putInt(PREF_KEY_NEXT_DELAY_MS, 500)
+                updateNextDelayUI(500)
+                rbEngineNative.isChecked = true
+                editor.putString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE)
+                tvActivePreset.text = "Active: 🚀 Turbo Mode"
+                tvActivePreset.setTextColor(Color.parseColor("#F43F5E"))
+                Toast.makeText(this, "🚀 Turbo Mode: Max speed, minimum delay!", Toast.LENGTH_SHORT).show()
+            }
+            "STEALTH" -> {
+                // 👻 Stealth Mode: Maximum discretion, battery camouflage,
+                // haptic-only feedback, slow scan, anti-cheat ON
+                rbHudIsland.isChecked = true
+                editor.putString(PREF_KEY_HUD_STYLE, HUD_STYLE_ISLAND)
+                rbStealthMode.isChecked = true
+                editor.putString(PREF_KEY_DISPLAY_MODE, MODE_STEALTH)
+                swBatteryCamouflage.isChecked = true
+                editor.putBoolean(PREF_KEY_CAMOUFLAGE, true)
+                swHapticFeedback.isChecked = true
+                editor.putBoolean(PREF_KEY_HAPTIC, true)
+                swAntiCheat.isChecked = true
+                editor.putBoolean(PREF_KEY_ANTI_CHEAT, true)
+                swAutoClickBot.isChecked = false
+                editor.putBoolean(PREF_KEY_AUTO_CLICK, false)
+                swAfkMode.isChecked = false
+                editor.putBoolean(PREF_KEY_AFK_MODE, false)
+                swInstantTrigger.isChecked = false
+                editor.putBoolean(PREF_KEY_INSTANT_TRIGGER, false)
+                sbScanInterval.progress = 6 // 7s
+                editor.putInt(PREF_KEY_SCAN_INTERVAL_SEC, 7)
+                updateScanIntervalUI(7)
+                sbNextDelay.progress = 5 // 3.0s
+                editor.putInt(PREF_KEY_NEXT_DELAY_MS, 3000)
+                updateNextDelayUI(3000)
+                rbEngineNative.isChecked = true
+                editor.putString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE)
+                tvActivePreset.text = "Active: 👻 Stealth Mode"
+                tvActivePreset.setTextColor(Color.parseColor("#8B5CF6"))
+                Toast.makeText(this, "👻 Stealth Mode: Maximum discretion", Toast.LENGTH_SHORT).show()
+            }
+        }
+        editor.apply()
     }
 
     // ─── Interactive Jelly Touch Rebound Animation ────────────────────────────

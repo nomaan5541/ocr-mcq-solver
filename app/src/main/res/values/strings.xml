@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OCR MCQ Solver</string>
-    <string name="accessibility_service_description">OmniSolve Auto-Click Bot: Automatically taps the correct MCQ answer on screen after solving. Enable this to allow the bot to click answers for you.</string>
+    <string name="app_name">OmniSolve AI</string>
+    <string name="accessibility_service_description">OmniSolve AI Assistant: Provides intelligent screen analysis and interaction assistance. Enable this to allow automated screen interactions.</string>
 </resources>

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#E60A241A"
-        android:endColor="#E6041710"
-        android:angle="270" />
-    <corners android:radius="12dp" />
-    <stroke
-        android:width="1.5dp"
-        android:color="#8010B981" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Emerald Answer Box Fill -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#CC0D2E1A"
+                android:endColor="#CC0A1F14"
+                android:angle="270" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <!-- Emerald Glow Border -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="14dp" />
+            <stroke
+                android:width="1.5dp"
+                android:color="#6010B981" />
+        </shape>
+    </item>
+</layer-list>

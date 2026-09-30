@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#E6101F38"
-        android:endColor="#E60A1324"
-        android:angle="270" />
-    <corners android:radius="20dp" />
-    <stroke
-        android:width="1.5dp"
-        android:color="#6600F2FE" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Liquid Glass accent card with cyan border glow -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#CC101828"
+                android:centerColor="#CC0C1424"
+                android:endColor="#CC0A1020"
+                android:angle="270" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#1500D4FF"
+                android:endColor="#0500D4FF"
+                android:angle="270" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <stroke
+                android:width="1.2dp"
+                android:color="#5000D4FF" />
+        </shape>
+    </item>
+</layer-list>
