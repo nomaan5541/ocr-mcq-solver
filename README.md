@@ -1,8 +1,6 @@
-# ⚡ OmniSolve: Next-Gen AI Screen Assistant & Autonomous MCQ Solver
+# ⚡ [ocr-mcq-solver](https://github.com/nomaan5541/ocr-mcq-solver): Next-Gen AI Screen Assistant & Autonomous MCQ Solver
 
 <div align="center">
-
-![OmniSolve Logo](app/src/main/res/drawable/virus_logo.png)
 
 ### **Engineered & Created with 🔥 by [virus_boss](https://github.com/nomaan5541)**
 
@@ -23,7 +21,7 @@
 <br/><br/>
 
 [![Download on itch.io](https://img.shields.io/badge/🎮%20Download%20on-itch.io-FA5C5C?style=for-the-badge&logo=itchdotio&logoColor=white)](https://nomaan.itch.io/ocr-mcq-solver)
-[![Direct APK Download](https://img.shields.io/badge/📦%20Download-Latest%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/nomaan5541/ocr-mcq-solver/releases/download/final-update/OmniSolve-v1.0.0.apk)
+[![Direct APK Download](https://img.shields.io/badge/📦%20Download-Latest%20APK-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/nomaan5541/ocr-mcq-solver/releases/download/final-update/ocr-mcq-solver-v1.0.0.apk)
 
 </div>
 
@@ -49,11 +47,11 @@
 
 ## 🌟 Executive Overview
 
-**OmniSolve** is a purpose-engineered, real-time Android System Overlay (`TYPE_APPLICATION_OVERLAY`) designed to inspect, analyze, and autonomously solve Multiple-Choice Questions (MCQs), standardized test problems, and complex queries directly on top of any active screen.
+**ocr-mcq-solver** is a purpose-engineered, real-time Android System Overlay (`TYPE_APPLICATION_OVERLAY`) designed to inspect, analyze, and autonomously solve Multiple-Choice Questions (MCQs), standardized test problems, and complex queries directly on top of any active screen.
 
-Unlike typical OCR utilities that demand tedious screenshots, manual file uploads, and disruptive app-switching cycles (triggering target app `onPause()` / `onStop()` events or anti-cheat flags), OmniSolve operates completely in-situ. It floats as an unobtrusive, physics-animated **Dynamic Island** widget directly below device camera cutouts and system status bars.
+Unlike typical OCR utilities that demand tedious screenshots, manual file uploads, and disruptive app-switching cycles (triggering target app `onPause()` / `onStop()` events or anti-cheat flags), ocr-mcq-solver operates completely in-situ. It floats as an unobtrusive, physics-animated **Dynamic Island** widget directly below device camera cutouts and system status bars.
 
-### 💡 Why OmniSolve Exists
+### 💡 Why ocr-mcq-solver Exists
 * **Zero Disruption**: Never triggers window focus loss or screen navigation interrupts in the host app or browser.
 * **Dual-Engine Precision**: Offers instant native accessibility node inspection (`< 5ms` scraping overhead) with fallback to on-device Google ML Kit OCR.
 * **Autonomous Execution**: Identifies candidate option hitboxes, dispatches synthetic humanized touch taps on the target radio button or checkbox, and advances test sections autonomously.
@@ -64,7 +62,7 @@ Unlike typical OCR utilities that demand tedious screenshots, manual file upload
 
 ## 📸 Visual Showcase & Real-World Demos
 
-Here is OmniSolve operating in live environments—from UI customization and autonomous bot deck configuration to real-time examination problem solving:
+Here is ocr-mcq-solver operating in live environments—from UI customization and autonomous bot deck configuration to real-time examination problem solving:
 
 <div align="center">
 
@@ -105,7 +103,7 @@ Here is OmniSolve operating in live environments—from UI customization and aut
 
 ## 🏗️ Complete End-to-End System Architecture
 
-OmniSolve is engineered around a reactive, multi-tier asynchronous architecture spanning 5 specialized layers:
+ocr-mcq-solver is engineered around a reactive, multi-tier asynchronous architecture spanning 5 specialized layers:
 
 ### 1. Architectural Layer Stack
 
@@ -423,7 +421,7 @@ When the floating Dynamic Island launched, it frequently rendered directly *behi
 ### 🚨 Challenge 3: Previous Question Returns & Gemini WebView Backend Freeze
 
 #### 💥 The Problem
-During prolonged test-solving runs, after correctly answering Question #1 and advancing to Question #2, OmniSolve would suddenly display the answer to Question #1 again! In some runs, after 1 question was answered, the bot became completely unresponsive, as if the connection to Gemini had terminated.
+During prolonged test-solving runs, after correctly answering Question #1 and advancing to Question #2, ocr-mcq-solver would suddenly display the answer to Question #1 again! In some runs, after 1 question was answered, the bot became completely unresponsive, as if the connection to Gemini had terminated.
 
 #### 🔬 Root Cause Analysis
 1. **Background WebView Process Suspension**: In an effort to conserve battery, `geminiWebView.onPause()` was invoked when dormant. However, Chromium's WebView implementation suspends JavaScript execution threads and drops active WebSocket connections when paused. When resumed, the chat session desynchronized.
@@ -536,7 +534,7 @@ Implemented a 4-stage discrete opacity engine (`100%` $\rightarrow$ `90%` $\righ
 
 ## 💻 How You Can Build It (Step-by-Step Guide)
 
-Follow these exact steps to clone, configure, build, and deploy OmniSolve from source code:
+Follow these exact steps to clone, configure, build, and deploy ocr-mcq-solver from source code:
 
 ### Step 1: Clone the Repository
 Open a terminal (PowerShell on Windows, Bash/Zsh on Linux/macOS) and execute:
@@ -546,7 +544,7 @@ cd ocr-mcq-solver
 ```
 
 ### Step 2: Configure JDK 17
-OmniSolve requires Java 17 for compatibility with Android Gradle Plugin 8.5.2.
+ocr-mcq-solver requires Java 17 for compatibility with Android Gradle Plugin 8.5.2.
 
 #### Windows (PowerShell):
 ```powershell
@@ -688,7 +686,7 @@ app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 
 ### Hitbox Calculation Details
-Rather than tapping the geometric center of an option text bounding box (which can miss radio buttons or misclick nested hyperlinks), OmniSolve calculates the target selector coordinates using:
+Rather than tapping the geometric center of an option text bounding box (which can miss radio buttons or misclick nested hyperlinks), ocr-mcq-solver calculates the target selector coordinates using:
 $$\text{Tap}_X = \text{OptionRect.left} + 24\,\text{dp}$$
 $$\text{Tap}_Y = \text{OptionRect.centerY()}$$
 This ensures the synthetic touch lands squarely on the interactive radio circle or checkbox indicator.
@@ -707,35 +705,35 @@ When sideloading debug-signed builds, Google Play Protect may show a modal: *"Bl
 * *Technical Note*: This occurs solely because debug APKs use the default Android development certificate. Building with a production release keystore permanently eliminates this prompt.
 
 ### 📱 Samsung (One UI)
-1. **Appear on Top**: Settings → Apps → Special Access (top-right menu ⋮) → **Appear on top** → Toggle **OmniSolve ON**.
-2. **Accessibility**: Settings → Accessibility → Installed apps → **OmniSolve Auto-Click** → Toggle **ON**.
-3. **Battery Management**: Settings → Apps → OmniSolve → Battery → Select **Unrestricted**.
+1. **Appear on Top**: Settings → Apps → Special Access (top-right menu ⋮) → **Appear on top** → Toggle **ocr-mcq-solver ON**.
+2. **Accessibility**: Settings → Accessibility → Installed apps → **ocr-mcq-solver Auto-Click** → Toggle **ON**.
+3. **Battery Management**: Settings → Apps → ocr-mcq-solver → Battery → Select **Unrestricted**.
 
 ### 📱 OnePlus / OPPO / Realme (OxygenOS / ColorOS / Realme UI)
-1. **Display Over Other Apps**: Settings → Apps → Special app access → **Display over other apps** → Enable **OmniSolve**.
-2. **Accessibility Service**: Settings → Additional Settings → Accessibility → Downloaded apps → Enable **OmniSolve Auto-Click**.
-3. **Background Activity**: Settings → Battery → More settings → App battery management → OmniSolve → Enable **Allow background activity** and **Allow auto-launch**.
-4. **App Not Installed Fix**: OmniSolve includes `useLegacyPackaging = true` and `extractNativeLibs = true`, resolving OxygenOS installation errors out-of-the-box.
+1. **Display Over Other Apps**: Settings → Apps → Special app access → **Display over other apps** → Enable **ocr-mcq-solver**.
+2. **Accessibility Service**: Settings → Additional Settings → Accessibility → Downloaded apps → Enable **ocr-mcq-solver Auto-Click**.
+3. **Background Activity**: Settings → Battery → More settings → App battery management → ocr-mcq-solver → Enable **Allow background activity** and **Allow auto-launch**.
+4. **App Not Installed Fix**: ocr-mcq-solver includes `useLegacyPackaging = true` and `extractNativeLibs = true`, resolving OxygenOS installation errors out-of-the-box.
 
 ### 📱 Xiaomi / Redmi / POCO (MIUI / HyperOS)
-1. **Pop-up Windows Permission**: Settings → Apps → Manage Apps → OmniSolve → Permissions → Enable **Display pop-up windows while running in the background**.
-2. **Autostart Permission**: Toggle **Autostart** to **ON** for OmniSolve.
-3. **Battery Saver**: Settings → Battery → OmniSolve → Select **No restrictions**.
-4. **Accessibility**: Settings → Additional Settings → Accessibility → Downloaded apps → Turn on **OmniSolve Auto-Click**.
+1. **Pop-up Windows Permission**: Settings → Apps → Manage Apps → ocr-mcq-solver → Permissions → Enable **Display pop-up windows while running in the background**.
+2. **Autostart Permission**: Toggle **Autostart** to **ON** for ocr-mcq-solver.
+3. **Battery Saver**: Settings → Battery → ocr-mcq-solver → Select **No restrictions**.
+4. **Accessibility**: Settings → Additional Settings → Accessibility → Downloaded apps → Turn on **ocr-mcq-solver Auto-Click**.
 
 ---
 
 ## 🎮 Operating Instructions & User Guide
 
 ### 1. Launch & Authorization
-1. Launch **OmniSolve** from your app launcher.
+1. Launch **ocr-mcq-solver** from your app launcher.
 2. Tap **"🔑 Manage / Login"** to complete a one-time sign-in to your personal Google account. This initializes the background headless Gemini session with full capabilities.
-3. Return to the dashboard and tap **"Enable Accessibility"**. Enable **OmniSolve Auto-Click** in system settings.
+3. Return to the dashboard and tap **"Enable Accessibility"**. Enable **ocr-mcq-solver Auto-Click** in system settings.
 4. Select your operational preset:
    * **📝 Exam Mode**: 3-second cycle interval, Battery Camouflage ON, tactile Haptics ON.
    * **🚀 Turbo Mode**: 1-second cycle interval, 500ms auto-advance delay, instant continuous solving.
    * **🛡️ Stealth Mode**: 7-second cycle interval, 95% HUD transparency, zero visual cues.
-5. Tap **"🚀 Launch OmniSolve Overlay"** and approve the one-time MediaProjection permission prompt.
+5. Tap **"🚀 Launch ocr-mcq-solver Overlay"** and approve the one-time MediaProjection permission prompt.
 
 ### 2. Using the Dynamic Island
 * **Single Tap on Island**: Triggers an instant screen scan and answer lookup.
@@ -789,7 +787,7 @@ dependencies {
 ## ❓ FAQ & Troubleshooting
 
 #### Q1: Why do I see "App not installed" when installing on OnePlus or Xiaomi?
-**A**: This is caused by modern OEM security policies requiring uncompressed native `.so` libraries and explicit alignment. OmniSolve addresses this with `useLegacyPackaging = true` and `extractNativeLibs = true`. If you still experience this, uninstall any existing version of the app before installing the new build.
+**A**: This is caused by modern OEM security policies requiring uncompressed native `.so` libraries and explicit alignment. ocr-mcq-solver addresses this with `useLegacyPackaging = true` and `extractNativeLibs = true`. If you still experience this, uninstall any existing version of the app before installing the new build.
 
 #### Q2: Why is the Dynamic Island overlapping my status bar?
 **A**: Ensure you are using the latest build. System insets handling (`ViewCompat.setOnApplyWindowInsetsListener`) and dynamic status bar offset calculation (`getStatusBarHeight()`) guarantee the island sits strictly below device notches, cameras, and system status indicators.
@@ -798,7 +796,7 @@ dependencies {
 **A**: Play Protect warnings appear for any sideloaded APK signed with the default debug key. To eliminate it, generate a standard release keystore using `keytool` and configure signing in `app/build.gradle.kts`.
 
 #### Q4: What if a test application blocks native Accessibility scraping?
-**A**: OmniSolve seamlessly falls back to on-device Google ML Kit OCR. Simply trigger a scan via the Dynamic Island or set the extraction mode to OCR in the dashboard.
+**A**: ocr-mcq-solver seamlessly falls back to on-device Google ML Kit OCR. Simply trigger a scan via the Dynamic Island or set the extraction mode to OCR in the dashboard.
 
 ---
 
@@ -830,6 +828,6 @@ copies or substantial portions of the Software.
 
 <div align="center">
 
-**⭐ If OmniSolve accelerates your workflow or helps you understand advanced Android system overlay architecture, give the repository a star! ⭐**
+**⭐ If ocr-mcq-solver accelerates your workflow or helps you understand advanced Android system overlay architecture, give the repository a star! ⭐**
 
 </div>
