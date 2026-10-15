@@ -17,7 +17,7 @@ import android.view.accessibility.AccessibilityNodeInfo
  * - Uses dispatchGesture() (API 24+) or native ACTION_CLICK to interact with any app.
  *
  * The user MUST manually enable this service in:
- *   Settings → Accessibility → OmniSolve Auto-Click
+ *   Settings → Accessibility → OCR MCQ Solver Assistant
  */
 class AutoClickAccessibilityService : AccessibilityService() {
 

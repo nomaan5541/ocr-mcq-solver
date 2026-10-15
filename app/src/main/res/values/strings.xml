@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ocr-mcq-solver</string>
-    <string name="accessibility_service_description">ocr-mcq-solver Assistant: Provides intelligent screen analysis and interaction assistance. Enable this to allow automated screen interactions.</string>
+    <string name="app_name">OCR MCQ Solver - AI Study Assistant</string>
+    <string name="accessibility_service_description">OCR MCQ Solver Assistant: Provides intelligent screen analysis and study assistance. Enable this to allow automated screen interactions.</string>
 </resources>
+

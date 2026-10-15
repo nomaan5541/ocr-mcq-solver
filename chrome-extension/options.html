@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Vision Solver - Settings, Camouflage & Stealth Controls</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="background-glow glow-1"></div>
+  <div class="background-glow glow-2"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="logo-box">
+          <img src="icons/icon_48.png" alt="Smart Vision Logo" id="headerLogo" class="brand-logo">
+          <div class="logo-pulse"></div>
+        </div>
+        <div class="brand-text">
+          <h1>Smart Vision Solver</h1>
+          <span class="badge-stealth">Stealth Architecture v1.8 • Full Mobile & Vision Suite</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="companionStatus" class="companion-pill checking">
+          <span class="dot"></span>
+          <span class="status-label">Checking Companion...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Nav Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-engines">
+        <span>🤖 Engines & Solvers</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-stealth">
+        <span>🎭 Stealth & Camouflage</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-mobile">
+        <span>📱 Mobile & Quick Solvers</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-history">
+        <span>📜 Solved History</span>
+        <span class="tab-badge" id="historyCountBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-hardware">
+        <span>💡 Hardware LED</span>
+      </button>
+    </nav>
+
+    <!-- TAB 1: ENGINES & SOLVERS -->
+    <section id="tab-engines" class="tab-pane active">
+      <div class="card config-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title-icon">⚡</div>
+          <div>
+            <h2>Solver Engines & AI Providers</h2>
+            <p>Runs 100% in background with zero visible tabs and zero desktop windows</p>
+          </div>
+        </div>
+
+        <!-- Engine Choice Selector -->
+        <div class="engine-selector-box">
+          <label class="engine-option">
+            <input type="radio" name="solverEngine" value="headless_gemini" id="engineHeadless" checked>
+            <div class="engine-info">
+              <span class="engine-title">🤖 Headless Gemini Web (Zero API Key • Free & Unlimited) [Recommended ⭐]</span>
+              <span class="engine-desc">Runs in silent background process. Zero browser tabs, zero desktop windows, zero quota limits</span>
+            </div>
+          </label>
+          <label class="engine-option">
+            <input type="radio" name="solverEngine" value="gemini_api" id="engineApi">
+            <div class="engine-info">
+              <span class="engine-title">⚡ Google Gemini Cloud API Key Pool (Ultra-Fast 0.5s)</span>
+              <span class="engine-desc">Cloud API via Google AI Studio with Multi-Key Auto-Failover</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Headless Companion Controls -->
+        <div id="headlessSection" class="api-section-wrapper">
+          <div class="divider">
+            <span>HEADLESS GEMINI ENGINE (PORT 59124)</span>
+          </div>
+          <div class="companion-status-box" style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:0.85rem 1rem; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;">
+            <div>
+              <div style="font-weight:600; color:#f8fafc; font-size:0.95rem;" id="companionEngineTitle">Headless Gemini Engine</div>
+              <div style="font-size:0.8rem; color:#94a3b8;" id="companionEngineDesc">Checking background server on port 59124...</div>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" id="testHeadlessBtn" class="btn-link-action" style="background:#2563eb; color:white; padding:0.4rem 0.75rem; border-radius:6px;" title="Test live solve on background engine">⚡ Test Solve</button>
+              <button type="button" id="launchLoginBtn" class="btn-link-action" style="background:#334155; color:white; padding:0.4rem 0.75rem; border-radius:6px;" title="Optional one-time login">🔑 Google Sign-In</button>
+              <button type="button" id="resetChatBtn" class="btn-link-action" style="background:#1e293b; color:#cbd5e1; padding:0.4rem 0.75rem; border-radius:6px;" title="Reset Gemini chat context">🧹 Reset Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-API Key Section -->
+        <div id="apiKeySection" class="api-section-wrapper" style="display: none;">
+          <div class="divider">
+            <span>MULTI-API KEY POOL (AUTO-FAILOVER)</span>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label for="apiKey" style="margin:0;">Gemini API Key Pool</label>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:#38bdf8; font-size:0.8rem; text-decoration:none; font-weight:500;">
+                Get Free API Keys (Google AI Studio) ↗
+              </a>
+            </div>
+            <textarea id="apiKey" class="textarea-pool" placeholder="Paste one or more Gemini API keys (one per line):&#10;AIzaSyA...&#10;AIzaSyB...&#10;AIzaSyC..."></textarea>
+            <div class="key-pool-meta">
+              <span>Supports multiple keys: Automatically fails over to the next key if 429 quota is reached.</span>
+              <span id="keyPoolCountBadge" style="color:#38bdf8; font-weight:600;">0 Keys in Pool</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-action">
+              <label for="modelSelect">Flagship API Model</label>
+              <button type="button" id="testApiBtn" class="btn-link-action" style="color:#34d399;" title="Test key pool with Google">⚡ Test API Key Pool</button>
+            </div>
+            <select id="modelSelect">
+              <option value="gemini-2.0-flash" selected>Gemini 2.0 Flash (Ultra-Fast 0.5s Flagship) [Active & Recommended]</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Standard Free Tier) [Active]</option>
+              <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash-Lite (Low Latency) [Active]</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deep Reasoning) [Active]</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card-actions" style="margin-top:1.5rem;">
+          <button id="saveBtn" class="btn btn-primary">
+            <span class="btn-text">Save Settings</span>
+          </button>
+          <span id="saveStatus" class="save-status-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: STEALTH & CAMOUFLAGE -->
+    <section id="tab-stealth" class="tab-pane">
+      <div class="card config-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title-icon">🎭</div>
+          <div>
+            <h2>Camouflage Toolbar Icon & Disguise Modes</h2>
+            <p>Disguise the extension icon so nobody looking at your screen suspects an MCQ solver</p>
+          </div>
+        </div>
+
+        <label style="font-weight:600; font-size:0.95rem; color:#f1f5f9; display:block; margin-bottom:0.5rem;">
+          Choose Your Toolbar Camouflage Icon:
+        </label>
+        
+        <div class="disguise-grid">
+          <div class="disguise-card selected" data-disguise="default">
+            <span class="selected-tag">ACTIVE</span>
+            <img src="icons/icon_48.png" alt="Smart Vision" class="disguise-icon-preview">
+            <span class="disguise-title">Smart Vision</span>
+            <span class="disguise-desc">Clean modern AI emblem</span>
+          </div>
+          <div class="disguise-card" data-disguise="translate">
+            <span class="selected-tag">ACTIVE</span>
+            <img src="icons/disguise_translate_48.png" alt="Google Translate" class="disguise-icon-preview">
+            <span class="disguise-title">Google Translate</span>
+            <span class="disguise-desc">Disguised as translation utility</span>
+          </div>
+          <div class="disguise-card" data-disguise="audio">
+            <span class="selected-tag">ACTIVE</span>
+            <img src="icons/disguise_audio_48.png" alt="Audio Booster" class="disguise-icon-preview">
+            <span class="disguise-title">Audio Equalizer</span>
+            <span class="disguise-desc">Disguised as volume booster</span>
+          </div>
+          <div class="disguise-card" data-disguise="zoom">
+            <span class="selected-tag">ACTIVE</span>
+            <img src="icons/disguise_zoom_48.png" alt="Page Magnifier" class="disguise-icon-preview">
+            <span class="disguise-title">Page Zoom</span>
+            <span class="disguise-desc">Disguised as accessibility magnifier</span>
+          </div>
+        </div>
+
+        <div class="divider">
+          <span>TOOLBAR HOVER TOOLTIP (INNOCENT CAMOUFLAGE)</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="customTooltipInput">Innocent Mouseover Tooltip Text</label>
+          <div class="url-copy-box" style="margin-bottom: 0.5rem;">
+            <input type="text" id="customTooltipInput" class="mobile-url-field" placeholder="e.g. Google Translate - Web Page Translation" style="color:#f8fafc;">
+            <button type="button" id="resetTooltipBtn" class="btn-copy-url">🔄 Auto-Match</button>
+          </div>
+          <div class="tooltip-preset-pills">
+            <span class="preset-label">Quick Presets:</span>
+            <button type="button" class="pill-btn tooltip-preset" data-tooltip="Google Translate - Web Page Translation">🌐 Google Translate</button>
+            <button type="button" class="pill-btn tooltip-preset" data-tooltip="Volume Master - Sound Equalizer">🔊 Volume Equalizer</button>
+            <button type="button" class="pill-btn tooltip-preset" data-tooltip="Page Magnifier & Display Tools">🔍 Page Magnifier</button>
+            <button type="button" class="pill-btn tooltip-preset" data-tooltip="Google Docs Offline Assistant">📄 Docs Offline</button>
+            <button type="button" class="pill-btn tooltip-preset" data-tooltip="Accessibility Quick Tools">♿ Accessibility</button>
+          </div>
+          <p class="form-hint" style="margin-top:0.4rem;">
+            This innocent text appears when anyone hovers their mouse over your toolbar extension icon. It never mentions MCQ, solving, or answers!
+          </p>
+        </div>
+
+        <div class="divider">
+          <span>ANSWER SIGNALING MODE</span>
+        </div>
+
+        <div class="signal-mode-selector">
+          <label class="signal-mode-card">
+            <input type="radio" name="signalMode" value="letters" id="signalLetters" checked>
+            <div class="signal-mode-info">
+              <span class="signal-mode-title">🔤 Subtle Letter Morph</span>
+              <span class="signal-mode-desc">Icon morphs to A, B, C, or D for a few seconds</span>
+            </div>
+          </label>
+          <label class="signal-mode-card">
+            <input type="radio" name="signalMode" value="symbols" id="signalSymbols">
+            <div class="signal-mode-info">
+              <span class="signal-mode-title">🎨 Coded Symbol Icons [NEW! ⭐]</span>
+              <span class="signal-mode-desc">Morphs to innocent symbols: Airplane=A, Balloon=B, Cloud=C, Diamond=D</span>
+            </div>
+          </label>
+          <label class="signal-mode-card">
+            <input type="radio" name="signalMode" value="dots" id="signalDots">
+            <div class="signal-mode-info">
+              <span class="signal-mode-title">🔒 Anti-Peeking Micro-Dots [Top Stealth]</span>
+              <span class="signal-mode-desc">Shows 1, 2, 3, or 4 tiny dots (1=A, 2=B, 3=C, 4=D)</span>
+            </div>
+          </label>
+          <label class="signal-mode-card">
+            <input type="radio" name="signalMode" value="stealth_stay" id="signalStay">
+            <div class="signal-mode-info">
+              <span class="signal-mode-title">🛡️ Camouflage Lock</span>
+              <span class="signal-mode-desc">Keeps disguise icon locked; only badge/corner dot updates</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Coded Symbol Customizer Panel (Visible when symbols mode is active) -->
+        <div id="symbolSelectorPanel" class="symbol-panel-box" style="display:none; margin-top:1.25rem; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+            <div>
+              <span style="font-weight:600; font-size:0.95rem; color:#f8fafc; display:block;">Coded Symbol Mappings</span>
+              <span style="font-size:0.8rem; color:#94a3b8;">Choose which innocent icon represents each option letter</span>
+            </div>
+            <!-- Preset Themes -->
+            <div class="theme-preset-buttons" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+              <button type="button" class="pill-btn symbol-theme-btn active" data-theme="alphabet">✈️ Alphabet</button>
+              <button type="button" class="pill-btn symbol-theme-btn" data-theme="tools">🛠️ Tools</button>
+              <button type="button" class="pill-btn symbol-theme-btn" data-theme="shapes">🔷 Shapes</button>
+              <button type="button" class="pill-btn symbol-theme-btn" data-theme="fun">🍎 Everyday</button>
+            </div>
+          </div>
+
+          <!-- 4 Columns for Choice A, B, C, D -->
+          <div class="symbol-grid-picker">
+            <!-- Choice A -->
+            <div class="symbol-choice-col">
+              <div class="choice-col-header" style="color:#34d399;">
+                <span class="choice-col-tag tag-a">Choice A</span>
+                <img id="previewA" src="icons/sym_airplane_32.png" alt="A" class="mini-sym-preview">
+              </div>
+              <select id="symbolSelectA" class="symbol-select">
+                <option value="airplane" selected>✈️ Airplane</option>
+                <option value="apple">🍎 Apple</option>
+                <option value="anchor">⚓ Anchor</option>
+                <option value="triangle">🔺 Triangle</option>
+              </select>
+            </div>
+
+            <!-- Choice B -->
+            <div class="symbol-choice-col">
+              <div class="choice-col-header" style="color:#60a5fa;">
+                <span class="choice-col-tag tag-b">Choice B</span>
+                <img id="previewB" src="icons/sym_balloon_32.png" alt="B" class="mini-sym-preview">
+              </div>
+              <select id="symbolSelectB" class="symbol-select">
+                <option value="balloon" selected>🎈 Balloon</option>
+                <option value="ball">⚽ Ball</option>
+                <option value="book">📖 Book</option>
+                <option value="square">🟦 Square</option>
+              </select>
+            </div>
+
+            <!-- Choice C -->
+            <div class="symbol-choice-col">
+              <div class="choice-col-header" style="color:#c084fc;">
+                <span class="choice-col-tag tag-c">Choice C</span>
+                <img id="previewC" src="icons/sym_cloud_32.png" alt="C" class="mini-sym-preview">
+              </div>
+              <select id="symbolSelectC" class="symbol-select">
+                <option value="cloud" selected>☁️ Cloud</option>
+                <option value="clock">⏰ Clock</option>
+                <option value="coffee">☕ Coffee Cup</option>
+                <option value="circle">🟢 Circle</option>
+              </select>
+            </div>
+
+            <!-- Choice D -->
+            <div class="symbol-choice-col">
+              <div class="choice-col-header" style="color:#fb923c;">
+                <span class="choice-col-tag tag-d">Choice D</span>
+                <img id="previewD" src="icons/sym_diamond_32.png" alt="D" class="mini-sym-preview">
+              </div>
+              <select id="symbolSelectD" class="symbol-select">
+                <option value="diamond" selected>💎 Diamond</option>
+                <option value="document">📄 Document</option>
+                <option value="dice">🎲 Dice</option>
+                <option value="star">⭐ Star</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem; padding:0.75rem; background:rgba(0,0,0,0.3); border-radius:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+            <span style="font-size:0.8rem; color:#cbd5e1;">Test Coded Symbols on Active Tab:</span>
+            <div style="display:flex; gap:0.4rem;">
+              <button type="button" class="btn btn-outline test-sym-btn" data-choice="A" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Test A</button>
+              <button type="button" class="btn btn-outline test-sym-btn" data-choice="B" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Test B</button>
+              <button type="button" class="btn btn-outline test-sym-btn" data-choice="C" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Test C</button>
+              <button type="button" class="btn btn-outline test-sym-btn" data-choice="D" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Test D</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin-top:1.5rem;">
+          <span>ADDITIONAL STEALTH INDICATORS</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>In-Page Screen Corner Dot</label>
+            <div class="toggle-pill-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="cornerDotEnabled" checked>
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-pill-label">3px Dot in bottom-right corner</span>
+            </div>
+            <p class="form-hint">Injects a tiny 3px dot on the exam page that vanishes after 4s.</p>
+          </div>
+
+          <div class="form-group flex-1">
+            <label>Earbud Audio Clicks</label>
+            <div class="toggle-pill-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="audioTicksEnabled">
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-pill-label">Headphone Clicks (1=A, 2=B, 3=C, 4=D)</span>
+            </div>
+            <p class="form-hint">Gentle, quiet audio pulses audible only through earbuds.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="autoResetSeconds">Auto-Reset Delay</label>
+            <div class="input-suffix-wrapper">
+              <input type="number" id="autoResetSeconds" min="3" max="60" value="10">
+              <span class="suffix">sec</span>
+            </div>
+            <p class="form-hint">Time before icon reverts to camouflage mode.</p>
+          </div>
+          <div class="form-group flex-1">
+            <label>Toolbar Badge Text</label>
+            <div class="toggle-pill-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="showBadge" checked>
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-pill-label">Show Letter Badge on Icon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions" style="margin-top:1.5rem;">
+          <button id="saveStealthBtn" class="btn btn-primary">
+            <span class="btn-text">Save Stealth Preferences</span>
+          </button>
+          <button id="testSimulationBtn" class="btn btn-secondary">
+            <span class="btn-text">⚡ Test Signal on Active Tab</span>
+          </button>
+          <span id="stealthSaveStatus" class="save-status-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MOBILE SYNC & QUICK SOLVERS -->
+    <section id="tab-mobile" class="tab-pane">
+      <!-- Mobile Phone Sync -->
+      <div class="card config-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title-icon">📱</div>
+          <div>
+            <h2>Mobile Phone Silent Haptic Sync (Wi-Fi)</h2>
+            <p>Receive silent physical vibrations on your smartphone over local Wi-Fi</p>
+          </div>
+        </div>
+
+        <div class="mobile-sync-container">
+          <div class="mobile-sync-info">
+            <label style="font-weight:600; font-size:0.95rem; color:#f1f5f9; display:block; margin-bottom:0.4rem;">
+              Mobile Web App Wi-Fi Address:
+            </label>
+            <div class="url-copy-box">
+              <input type="text" id="mobileUrlInput" readonly value="http://10.213.27.142:59124/mobile" class="mobile-url-field">
+              <button type="button" id="copyMobileUrlBtn" class="btn-copy-url">📋 Copy Link</button>
+              <a id="openMobileUrlLink" href="http://10.213.27.142:59124/mobile" target="_blank" rel="noopener" class="btn-open-url">↗ Open</a>
+            </div>
+            <p class="form-hint" style="margin-top:0.5rem;">
+              Open this URL on your phone browser (Chrome / Safari) connected to the same Wi-Fi. 
+              The page is 100% pitch black with zero light, vibrates silently in your pocket, and supports tap-and-hold to peek.
+            </p>
+
+            <div class="mobile-client-status-box" style="margin-top:1rem; display:flex; align-items:center; gap:0.75rem;">
+              <span class="pulse-indicator-dot" id="mobileSyncDot"></span>
+              <span id="mobileClientCountLabel" style="font-size:0.85rem; font-weight:500; color:#38bdf8;">Connecting to companion server...</span>
+            </div>
+
+            <!-- Test Mobile Vibration -->
+            <div style="margin-top:1.25rem;">
+              <label style="font-size:0.85rem; color:#94a3b8; display:block; margin-bottom:0.5rem;">
+                Test Vibration Signal on Connected Phone:
+              </label>
+              <div class="mobile-test-btn-row">
+                <button type="button" class="btn btn-outline mobile-vib-btn" data-choice="A">Buzz A (1x)</button>
+                <button type="button" class="btn btn-outline mobile-vib-btn" data-choice="B">Buzz B (2x)</button>
+                <button type="button" class="btn btn-outline mobile-vib-btn" data-choice="C">Buzz C (3x)</button>
+                <button type="button" class="btn btn-outline mobile-vib-btn" data-choice="D">Buzz D (4x)</button>
+              </div>
+              <span id="mobileTestStatus" class="save-status-msg" style="display:block; margin-top:0.35rem;"></span>
+            </div>
+          </div>
+
+          <!-- Dynamic QR Code Container -->
+          <div class="qr-box-wrapper">
+            <div id="qrCodeContainer" class="qr-canvas-box" title="Scan with phone camera to open instantly"></div>
+            <span class="qr-caption">📷 Scan with Phone Camera</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-Solve on Copy -->
+      <div class="card config-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title-icon">📋</div>
+          <div>
+            <h2>Auto-Solve on Copy (Clipboard Intelligence)</h2>
+            <p>Automatically solves questions copied anywhere in Windows without touching Chrome</p>
+          </div>
+        </div>
+
+        <div class="toggle-group highlight-toggle">
+          <div class="toggle-info">
+            <span class="toggle-title">Enable Auto-Solve on Ctrl+C</span>
+            <span class="toggle-desc">Detects MCQ pattern when you copy text anywhere in Windows and solves it silently</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="clipboardAutoSolveCheckbox">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <p class="form-hint" style="margin-top:0.75rem;">
+          Highlight question and options on any exam screen and press <kbd class="kbd-pill">Ctrl+C</kbd>. 
+          The background server detects the MCQ, solves it in &lt;3s, pulses your mobile phone and LED, and logs it to History!
+        </p>
+      </div>
+
+      <!-- Screenshot / Canvas OCR Solver & Panic Mode -->
+      <div class="card-row-split" style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+        <!-- Screenshot Solver -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-icon">📸</div>
+            <div>
+              <h3>Screenshot / Canvas Solver</h3>
+              <p>For protected exam portals with locked selection</p>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <span class="hotkey-badge">Alt + Shift + C</span>
+          </div>
+          <p class="form-hint" style="margin-bottom:1.25rem;">
+            Captures the active tab viewport invisibly and analyzes question diagrams or canvas with Gemini Vision.
+          </p>
+          <button type="button" id="testScreenshotBtn" class="btn btn-secondary" style="width:100%;">
+            ⚡ Test Screenshot Solve
+          </button>
+        </div>
+
+        <!-- Emergency Panic Mode -->
+        <div class="card" style="border-color: rgba(239, 68, 68, 0.25);">
+          <div class="card-header">
+            <div class="card-title-icon" style="background:rgba(239,68,68,0.15); color:#ef4444;">🚨</div>
+            <div>
+              <h3>Emergency Panic Mode</h3>
+              <p>Instant stealth wipe in 0.01 seconds</p>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <span class="hotkey-badge" style="background:rgba(239,68,68,0.15); color:#fca5a5; border-color:rgba(239,68,68,0.3);">Ctrl + Shift + Q</span>
+          </div>
+          <p class="form-hint" style="margin-bottom:1.25rem;">
+            Instantly clears toolbar badges, resets icons to camouflage, wipes on-screen dots/HUDs, and blacks out connected phones.
+          </p>
+          <button type="button" id="triggerPanicBtn" class="btn btn-outline" style="width:100%; color:#f87171; border-color:rgba(248,113,113,0.3);">
+            🚨 Trigger Emergency Panic Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Draggable Ghost HUD Settings -->
+      <div class="card config-card">
+        <div class="card-header">
+          <div class="card-title-icon">👻</div>
+          <div>
+            <h2>Draggable Ghost HUD (Subtle In-Page Badge)</h2>
+            <p>Movable semi-transparent answer indicator directly on the webpage</p>
+          </div>
+        </div>
+
+        <div class="toggle-group highlight-toggle">
+          <div class="toggle-info">
+            <span class="toggle-title">Enable In-Page Ghost HUD</span>
+            <span class="toggle-desc">Displays a semi-invisible letter badge on the webpage that reveals reasoning on mouse hover</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="ghostHudEnabledCheckbox" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="form-row" style="margin-top:1.25rem;">
+          <div class="form-group flex-1">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label for="ghostHudOpacitySlider">Ghost Badge Opacity</label>
+              <span id="ghostOpacityValueLabel" style="font-weight:600; color:#38bdf8;">8%</span>
+            </div>
+            <input type="range" id="ghostHudOpacitySlider" min="0.04" max="0.50" step="0.02" value="0.08" style="width:100%; accent-color:#6366f1;">
+            <p class="form-hint">At 8% opacity, it blends smoothly into backgrounds and is barely detectable to passersby.</p>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="ghostHudDurationInput">Auto-Hide Duration</label>
+            <div class="input-suffix-wrapper">
+              <input type="number" id="ghostHudDurationInput" min="5" max="60" value="15">
+              <span class="suffix">sec</span>
+            </div>
+            <p class="form-hint">Time before the floating badge smoothly vanishes.</p>
+          </div>
+        </div>
+
+        <!-- Live Ghost Preview Box -->
+        <div class="ghost-preview-container">
+          <span style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:0.5rem;">Interactive Live Preview (Hover over letter):</span>
+          <div class="ghost-preview-stage">
+            <div id="ghostPreviewBadge" class="ghost-preview-badge" style="opacity: 0.08;">
+              <span class="ghost-preview-letter">B</span>
+              <span class="ghost-preview-explanation">Answer detected: Option B is mathematically valid</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions" style="margin-top:1.5rem;">
+          <button id="saveQuickSolversBtn" class="btn btn-primary">
+            <span class="btn-text">Save Quick Solver Preferences</span>
+          </button>
+          <span id="quickSolversSaveStatus" class="save-status-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SOLVED MCQ HISTORY -->
+    <section id="tab-history" class="tab-pane">
+      <div class="card full-width">
+        <div class="card-header">
+          <div class="card-title-icon">📜</div>
+          <div>
+            <h2>Solved MCQ History & Session Logs</h2>
+            <p>Complete record of questions solved in this browser session</p>
+          </div>
+        </div>
+
+        <div class="history-header-actions">
+          <input type="text" id="historySearchInput" class="history-search-input" placeholder="🔍 Search question snippets or choices...">
+          <div style="display:flex; gap:0.5rem;">
+            <button id="exportHistoryBtn" class="btn btn-outline" style="font-size:0.85rem; padding:0.5rem 0.9rem;">📥 Export JSON</button>
+            <button id="clearHistoryBtn" class="btn btn-outline" style="font-size:0.85rem; padding:0.5rem 0.9rem; color:#f87171; border-color:rgba(248,113,113,0.3);">🗑️ Clear</button>
+          </div>
+        </div>
+
+        <div id="historyListContainer" class="history-list">
+          <div class="empty-history-msg">No questions solved yet in this session. Click the extension on any MCQ webpage to solve!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: HARDWARE KEYBOARD LED -->
+    <section id="tab-hardware" class="tab-pane">
+      <div class="card hardware-card">
+        <div class="card-header">
+          <div class="card-title-icon">💡</div>
+          <div>
+            <h2>Physical Keyboard LED Controller</h2>
+            <p>Stealth hardware feedback via CapsLock, NumLock, or ScrollLock</p>
+          </div>
+        </div>
+
+        <div class="toggle-group highlight-toggle">
+          <div class="toggle-info">
+            <span class="toggle-title">Enable Hardware LED Signaling</span>
+            <span class="toggle-desc">Blinks your physical keyboard light according to the solved answer</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="ledEnabled" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-top:1.25rem;">
+          <label for="ledKey">Target Keyboard Light</label>
+          <select id="ledKey">
+            <option value="caps_lock" selected>Caps Lock LED (Default: Embedded light on CapsLock key)</option>
+            <option value="scroll_lock">Scroll Lock LED (Dedicated light / Zero typing impact)</option>
+            <option value="num_lock">Num Lock LED (Numeric keypad indicator)</option>
+          </select>
+          <p class="form-hint">Note: On some laptops (like Lenovo LOQ/Legion), physical key LEDs are hardware-gated to physical finger presses. Use Toolbar Camouflage or Micro-Dots if your laptop ignores virtual key LEDs.</p>
+        </div>
+
+        <!-- Blink Legend -->
+        <div class="legend-box">
+          <div class="legend-title">Blink Pattern:</div>
+          <div class="legend-grid">
+            <div class="legend-item" data-choice="A"><span class="choice-tag tag-a">Choice A</span><span class="blink-count">1 Blink</span></div>
+            <div class="legend-item" data-choice="B"><span class="choice-tag tag-b">Choice B</span><span class="blink-count">2 Blinks</span></div>
+            <div class="legend-item" data-choice="C"><span class="choice-tag tag-c">Choice C</span><span class="blink-count">3 Blinks</span></div>
+            <div class="legend-item" data-choice="D"><span class="choice-tag tag-d">Choice D</span><span class="blink-count">4 Blinks</span></div>
+          </div>
+        </div>
+
+        <!-- Live Blink Test Buttons -->
+        <div class="test-hardware-section">
+          <label>Test Signal on Your Keyboard:</label>
+          <div class="test-buttons-row">
+            <button class="btn btn-outline test-btn" data-choice="A">Test A (1x)</button>
+            <button class="btn btn-outline test-btn" data-choice="B">Test B (2x)</button>
+            <button class="btn btn-outline test-btn" data-choice="C">Test C (3x)</button>
+            <button class="btn btn-outline test-btn" data-choice="D">Test D (4x)</button>
+          </div>
+          <div id="testOutput" class="test-feedback"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

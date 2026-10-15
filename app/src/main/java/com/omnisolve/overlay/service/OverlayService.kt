@@ -432,7 +432,7 @@ class OverlayService : Service() {
                 tvAnswerDisplay?.textSize = 13f
             } else {
                 ivIslandIcon?.setImageResource(R.drawable.ic_virus_avatar)
-                tvIslandTitle?.text = "OmniSolve"
+                tvIslandTitle?.text = "OCR MCQ Solver"
                 tvAnswerDisplay?.text = "?"
             }
 
@@ -980,7 +980,7 @@ class OverlayService : Service() {
                 val promptText = "CRITICAL INSTRUCTION: You are an expert MCQ Solver. Read the question and the choices below. Identify the single correct option letter (A, B, C, or D).\nSTRICT RULE: Reply ONLY with 'CORRECT_OPTION: X' where X is strictly one letter A, B, C, or D. Do not write any explanations, markdown or greetings.\n\n$extractedText"
 
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("OmniSolve Question", promptText))
+                clipboard.setPrimaryClip(ClipData.newPlainText("OCR MCQ Solver Question", promptText))
 
                 // 6. Inject into Gemini Web and activate response watcher
                 btnWindowScan?.text = "✨ Solving..."
@@ -1278,7 +1278,7 @@ class OverlayService : Service() {
                     if (text in listOf("A", "B", "C", "D")) {
                         tvIslandTitle?.text = "⚡ Answer"
                     } else {
-                        tvIslandTitle?.text = "OmniSolve"
+                        tvIslandTitle?.text = "OCR MCQ Solver"
                     }
                     tvAnswerDisplay?.text = text
                     tvAnswerDisplay?.setTextColor(Color.parseColor(colorHex))
@@ -1731,7 +1731,7 @@ class OverlayService : Service() {
                                     stopSelf()
                                 }
                                 ?.start()
-                            Toast.makeText(this@OverlayService, "👋 OmniSolve Closed", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@OverlayService, "👋 OCR MCQ Solver Closed", Toast.LENGTH_SHORT).show()
                             return true
                         }
 
@@ -1827,7 +1827,7 @@ class OverlayService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val ch = NotificationChannel(
-                CHANNEL_ID, "OmniSolve Overlay", NotificationManager.IMPORTANCE_LOW
+                CHANNEL_ID, "OCR MCQ Solver Overlay", NotificationManager.IMPORTANCE_LOW
             ).apply { description = "MCQ AI solver overlay" }
             getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
         }

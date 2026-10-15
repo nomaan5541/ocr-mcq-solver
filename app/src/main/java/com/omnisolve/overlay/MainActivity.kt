@@ -460,7 +460,7 @@ class MainActivity : AppCompatActivity() {
                 Uri.parse("package:$packageName")
             )
             startActivity(intent)
-            Toast.makeText(this, "Please enable 'Draw over other apps' for OmniSolve, then tap Start again", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Please enable 'Draw over other apps' for OCR MCQ Solver, then tap Start again", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -509,7 +509,7 @@ class MainActivity : AppCompatActivity() {
         isOverlayRunning = true
         btnToggleOverlay.text = "⏹️ Stop Overlay Service"
         btnToggleOverlay.setBackgroundResource(R.drawable.bg_glass_card)
-        Toast.makeText(this, "OmniSolve AI Overlay Active! Open any MCQ app.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "OCR MCQ Solver Active! Open any question screen.", Toast.LENGTH_LONG).show()
     }
 
     private fun updateIslandVisibilityButtons(selectedIndex: Int) {
@@ -536,7 +536,7 @@ class MainActivity : AppCompatActivity() {
         val serviceIntent = Intent(this, OverlayService::class.java)
         stopService(serviceIntent)
         isOverlayRunning = false
-        btnToggleOverlay.text = "🚀 Launch OmniSolve Overlay"
+        btnToggleOverlay.text = "🚀 Launch OCR MCQ Solver Overlay"
         btnToggleOverlay.setBackgroundResource(R.drawable.bg_glass_cta)
         Toast.makeText(this, "Overlay Service Stopped", Toast.LENGTH_SHORT).show()
     }
@@ -557,7 +557,7 @@ class MainActivity : AppCompatActivity() {
                 tvSpeedPresetTag.setTextColor(Color.parseColor("#10B981"))
             }
             else -> {
-                tvSpeedPresetTag.text = "🛡️ Stealth"
+                tvSpeedPresetTag.text = "🎯 Focus"
                 tvSpeedPresetTag.setTextColor(Color.parseColor("#A78BFA"))
             }
         }
@@ -708,9 +708,9 @@ class MainActivity : AppCompatActivity() {
                 updateNextDelayUI(1500)
                 rbEngineNative.isChecked = true
                 editor.putString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE)
-                tvActivePreset.text = "Active: 📝 Exam Mode"
+                tvActivePreset.text = "Active: 📝 Study Mode"
                 tvActivePreset.setTextColor(Color.parseColor("#10B981"))
-                Toast.makeText(this, "📝 Exam Mode: Balanced stealth + camouflage", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "📝 Study Mode: Balanced study assistance", Toast.LENGTH_SHORT).show()
             }
             "TURBO" -> {
                 // 🚀 Turbo Mode: Maximum speed, Dynamic Island HUD, auto-click ON,
@@ -766,9 +766,9 @@ class MainActivity : AppCompatActivity() {
                 updateNextDelayUI(3000)
                 rbEngineNative.isChecked = true
                 editor.putString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE)
-                tvActivePreset.text = "Active: 👻 Stealth Mode"
+                tvActivePreset.text = "Active: 🎯 Focus Mode"
                 tvActivePreset.setTextColor(Color.parseColor("#8B5CF6"))
-                Toast.makeText(this, "👻 Stealth Mode: Maximum discretion", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "🎯 Focus Mode: Minimal unobtrusive HUD", Toast.LENGTH_SHORT).show()
             }
         }
         editor.apply()

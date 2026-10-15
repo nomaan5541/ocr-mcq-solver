@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="⚡ OmniSolve • virus_boss"
+            android:text="⚡ OCR MCQ Solver • virus_boss"
             android:textColor="#F1F5F9"
             android:textSize="11sp"
             android:textStyle="bold"

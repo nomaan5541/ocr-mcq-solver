@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚡ OmniSolve AI Answer"
+            android:text="⚡ OCR MCQ Solver Answer"
             android:textColor="#00F2FE"
             android:textSize="12sp"
             android:textStyle="bold" />

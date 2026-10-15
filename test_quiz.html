@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Physiology Exam</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .quiz-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+    .question-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .option-item:hover {
+      border-color: #6366f1;
+      background: #1e1b4b;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-card">
+    <div class="quiz-header">
+      <span>Question 42 of 100</span>
+      <span>Cardiovascular Physiology</span>
+    </div>
+    <div class="question-title">
+      Which chamber of the human heart is responsible for pumping oxygen-rich blood into the aorta for systemic circulation?
+    </div>
+    <div class="options-list">
+      <div class="option-item">A) Right Atrium</div>
+      <div class="option-item">B) Right Ventricle</div>
+      <div class="option-item">C) Left Atrium</div>
+      <div class="option-item">D) Left Ventricle</div>
+    </div>
+  </div>
+</body>
+</html>

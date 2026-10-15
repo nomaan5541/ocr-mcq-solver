@@ -2,17 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions required for Android Screen Capture & Floating Overlay over Chrome/Apps -->
+    <!-- Permissions required for Android Screen Capture & Floating Overlay -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Required for Android 14+ Samsung/Xiaomi/OPPO/Realme/OnePlus OEM layers -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
-        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -25,10 +21,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
-        android:extractNativeLibs="true"
-        android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true"
-        tools:replace="android:label,android:icon,android:roundIcon,android:theme"
         tools:targetApi="35">
 
         <!-- Main Launcher Activity -->
@@ -42,6 +35,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Deep Link Intent Filter for Instant QR Code Pairing (omnisolve://sync?host=...&port=...) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="omnisolve" android:host="sync" />
             </intent-filter>
         </activity>
 

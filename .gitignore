@@ -12,3 +12,18 @@ app/build
 *.zip
 .agents/
 graphify-out/
+
+# Python cache & environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Chrome Extension internal cache
+_metadata/
+**/_metadata/
+
+# User session / Google profile data (Contains private cookies, credentials & browser cache)
+gemini_profile/
+**/gemini_profile/

@@ -47,7 +47,7 @@
             android:id="@+id/tv_island_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OmniSolve"
+            android:text="OCR MCQ Solver"
             android:textColor="#E2E8F0"
             android:textSize="12sp"
             android:textStyle="bold"

@@ -44,7 +44,7 @@
                     android:id="@+id/tv_app_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OmniSolve"
+                    android:text="OCR MCQ Solver"
                     android:textColor="#F8FAFC"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -69,7 +69,7 @@
                 android:id="@+id/tv_app_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Next-Gen AI Exam Assistant"
+                android:text="AI Study Assistant • virus_boss"
                 android:textColor="#94A3B8"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -444,7 +444,7 @@
                         android:layout_weight="1"
                         android:layout_marginEnd="4dp"
                         android:backgroundTint="#1A10B981"
-                        android:text="📝 Exam"
+                        android:text="📝 Study"
                         android:textAllCaps="false"
                         android:textColor="#10B981"
                         android:textSize="11sp"
@@ -473,7 +473,7 @@
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"
                         android:backgroundTint="#1A8B5CF6"
-                        android:text="👻 Stealth"
+                        android:text="🎯 Focus"
                         android:textAllCaps="false"
                         android:textColor="#8B5CF6"
                         android:textSize="11sp"
@@ -517,7 +517,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checked="false"
-                        android:text="🔋 Battery Camo"
+                        android:text="🔋 Battery Status"
                         android:textColor="#F0F4FD"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -527,7 +527,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="91% A • 92% B\n93% C • 94% D"
+                        android:text="Discreet Status Display"
                         android:textColor="#10B981"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -578,7 +578,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🥷 Overlay Display Mode"
+                    android:text="📱 Overlay Display Style"
                     android:textColor="#F0F4FD"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -594,7 +594,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="👻 Ghost Stealth Mode (Minimal discreet pill HUD)"
+                        android:text="Dynamic Island Pill (Compact HUD)"
                         android:textColor="#E2E8F0"
                         android:textSize="12sp" />
 
@@ -665,7 +665,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:checked="false"
-                    android:text="🚀 AEI Full AFK Bot (Auto Next / Save &amp; Next)"
+                    android:text="🚀 Auto-Advance Quiz Assistant (Next Question)"
                     android:textColor="#10B981"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -676,7 +676,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:checked="true"
-                    android:text="🛡️ Anti-Cheat Humanizer Protection"
+                    android:text="⏱️ Natural Human Paced Delay (Smooth Flow)"
                     android:textColor="#38BDF8"
                     android:textSize="13sp" />
 
@@ -872,7 +872,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="@drawable/bg_glass_cta"
-            android:text="🚀 Launch OmniSolve Overlay"
+            android:text="🚀 Launch OCR MCQ Solver Overlay"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
