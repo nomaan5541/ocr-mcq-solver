@@ -8,6 +8,9 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.Settings
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -51,6 +54,11 @@ class MainActivity : AppCompatActivity() {
         const val PREF_KEY_THEME_MODE = "PREF_THEME_MODE"
         const val THEME_DARK = "DARK"
         const val THEME_LIGHT = "LIGHT"
+        const val PREF_KEY_AUTO_COPY_CLIPBOARD = "PREF_AUTO_COPY_CLIPBOARD"
+        const val PREF_KEY_NATIVE_FALLBACK_OCR = "PREF_KEY_NATIVE_FALLBACK_OCR"
+        const val PREF_KEY_COMPANION_SYNC_ENABLED = "PREF_COMPANION_SYNC_ENABLED"
+        const val PREF_KEY_COMPANION_HOST = "PREF_COMPANION_HOST"
+        const val PREF_KEY_COMPANION_PORT = "PREF_COMPANION_PORT"
     }
 
     private lateinit var mainRoot: RelativeLayout
@@ -75,6 +83,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rbHudBubble: RadioButton
     private lateinit var swBatteryCamouflage: Switch
     private lateinit var swHapticFeedback: Switch
+    private lateinit var swAutoCopyClipboard: Switch
+    private lateinit var swNativeOcrFallback: Switch
+    private lateinit var swCompanionSync: Switch
+    private lateinit var etCompanionHost: EditText
+    private lateinit var etCompanionPort: EditText
+    private lateinit var tvCompanionStatusBadge: TextView
+    private lateinit var btnTestSyncVibration: Button
     private lateinit var rgDisplayMode: RadioGroup
     private lateinit var rbStealthMode: RadioButton
     private lateinit var rbWindowMode: RadioButton
@@ -185,6 +200,15 @@ class MainActivity : AppCompatActivity() {
         btnVis50 = findViewById(R.id.btn_vis_50)
         btnVis25 = findViewById(R.id.btn_vis_25)
 
+        // Stealth Safeguards & PC Companion Sync
+        swAutoCopyClipboard = findViewById(R.id.sw_auto_copy_clipboard)
+        swNativeOcrFallback = findViewById(R.id.sw_native_ocr_fallback)
+        swCompanionSync = findViewById(R.id.sw_companion_sync)
+        etCompanionHost = findViewById(R.id.et_companion_host)
+        etCompanionPort = findViewById(R.id.et_companion_port)
+        tvCompanionStatusBadge = findViewById(R.id.tv_companion_status_badge)
+        btnTestSyncVibration = findViewById(R.id.btn_test_sync_vibration)
+
         // ─── Window Insets: Keep layout safely below status/notification bar and above nav bar ───
         ViewCompat.setOnApplyWindowInsetsListener(mainRoot) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(
@@ -257,11 +281,57 @@ class MainActivity : AppCompatActivity() {
         rgExtractionEngine.setOnCheckedChangeListener { _, checkedId ->
             val engine = if (checkedId == R.id.rb_engine_ocr) ENGINE_OCR else ENGINE_NATIVE
             prefs.edit().putString(PREF_KEY_EXTRACTION_ENGINE, engine).apply()
+            notifyServiceConfigChanged()
             if (engine == ENGINE_NATIVE) {
                 Toast.makeText(this, "⚡ Native Mode: 0ms scraping & zero screenshots", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "📷 OCR Mode: Screen capture & ML Kit", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // Load saved Clipboard Safeguard preference (default false for stealth & OnePlus Nord 5)
+        swAutoCopyClipboard.isChecked = prefs.getBoolean(PREF_KEY_AUTO_COPY_CLIPBOARD, false)
+        swAutoCopyClipboard.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean(PREF_KEY_AUTO_COPY_CLIPBOARD, isChecked).apply()
+            notifyServiceConfigChanged()
+            if (isChecked) {
+                Toast.makeText(this, "📋 Auto-Copy Enabled (May show clipboard chip on OnePlus/Samsung)", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "🛡️ Clipboard Safe: Zero screen popup alerts", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Load saved Native Fallback to OCR preference (default true)
+        swNativeOcrFallback.isChecked = prefs.getBoolean(PREF_KEY_NATIVE_FALLBACK_OCR, true)
+        swNativeOcrFallback.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean(PREF_KEY_NATIVE_FALLBACK_OCR, isChecked).apply()
+            notifyServiceConfigChanged()
+        }
+
+        // Load saved PC Companion Wireless Sync preferences
+        etCompanionHost.setText(prefs.getString(PREF_KEY_COMPANION_HOST, "192.168.1.100"))
+        etCompanionPort.setText(prefs.getInt(PREF_KEY_COMPANION_PORT, 59124).toString())
+        val savedCompanionSync = prefs.getBoolean(PREF_KEY_COMPANION_SYNC_ENABLED, false)
+        swCompanionSync.isChecked = savedCompanionSync
+        updateCompanionStatusBadge(savedCompanionSync)
+
+        swCompanionSync.setOnCheckedChangeListener { _, isChecked ->
+            val host = etCompanionHost.text.toString().trim().ifEmpty { "192.168.1.100" }
+            val port = etCompanionPort.text.toString().trim().toIntOrNull() ?: 59124
+            prefs.edit()
+                .putBoolean(PREF_KEY_COMPANION_SYNC_ENABLED, isChecked)
+                .putString(PREF_KEY_COMPANION_HOST, host)
+                .putInt(PREF_KEY_COMPANION_PORT, port)
+                .apply()
+            updateCompanionStatusBadge(isChecked)
+            notifyServiceConfigChanged()
+            if (isChecked) {
+                Toast.makeText(this, "🔗 Live Pocket Sync Armed for $host:$port", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnTestSyncVibration.setOnClickListener {
+            testPocketHapticPulse()
         }
 
         // Load saved HUD style (Dynamic Island vs Bubble)
@@ -393,6 +463,15 @@ class MainActivity : AppCompatActivity() {
         // Apply saved theme safely now that all views and components are initialized
         currentThemeMode = prefs.getString(PREF_KEY_THEME_MODE, THEME_DARK) ?: THEME_DARK
         applyThemeMode(currentThemeMode, animate = false)
+
+        // Handle deep link pairing (omnisolve://sync?host=...&port=...)
+        handleIncomingDeepLink(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingDeepLink(intent)
     }
 
     override fun onResume() {
@@ -498,6 +577,9 @@ class MainActivity : AppCompatActivity() {
             putExtra(OverlayService.EXTRA_ANTI_CHEAT, antiCheat)
             putExtra(OverlayService.EXTRA_THEME_MODE, currentThemeMode)
             putExtra(OverlayService.EXTRA_ISLAND_OPACITY_INDEX, currentIslandOpacityIndex)
+            putExtra(OverlayService.EXTRA_COMPANION_HOST, prefs.getString(PREF_KEY_COMPANION_HOST, "192.168.1.100") ?: "192.168.1.100")
+            putExtra(OverlayService.EXTRA_COMPANION_PORT, prefs.getInt(PREF_KEY_COMPANION_PORT, 59124))
+            putExtra(OverlayService.EXTRA_COMPANION_SYNC_ENABLED, prefs.getBoolean(PREF_KEY_COMPANION_SYNC_ENABLED, false))
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -510,6 +592,114 @@ class MainActivity : AppCompatActivity() {
         btnToggleOverlay.text = "⏹️ Stop Overlay Service"
         btnToggleOverlay.setBackgroundResource(R.drawable.bg_glass_card)
         Toast.makeText(this, "OCR MCQ Solver Active! Open any question screen.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun notifyServiceConfigChanged() {
+        if (!isOverlayRunning) return
+        val extractionEngine = prefs.getString(PREF_KEY_EXTRACTION_ENGINE, ENGINE_NATIVE) ?: ENGINE_NATIVE
+        val displayMode = prefs.getString(PREF_KEY_DISPLAY_MODE, MODE_STEALTH) ?: MODE_STEALTH
+        val autoClick = prefs.getBoolean(PREF_KEY_AUTO_CLICK, false)
+        val hudStyle = prefs.getString(PREF_KEY_HUD_STYLE, HUD_STYLE_ISLAND) ?: HUD_STYLE_ISLAND
+        val camouflage = prefs.getBoolean(PREF_KEY_CAMOUFLAGE, false)
+        val haptic = prefs.getBoolean(PREF_KEY_HAPTIC, true)
+        val antiCheat = prefs.getBoolean(PREF_KEY_ANTI_CHEAT, true)
+        val afkMode = prefs.getBoolean(PREF_KEY_AFK_MODE, false)
+        val scanIntervalSec = prefs.getInt(PREF_KEY_SCAN_INTERVAL_SEC, 3)
+        val nextDelayMs = prefs.getInt(PREF_KEY_NEXT_DELAY_MS, 1500)
+        val instantTrigger = prefs.getBoolean(PREF_KEY_INSTANT_TRIGGER, true)
+        val host = prefs.getString(PREF_KEY_COMPANION_HOST, "192.168.1.100") ?: "192.168.1.100"
+        val port = prefs.getInt(PREF_KEY_COMPANION_PORT, 59124)
+        val syncEnabled = prefs.getBoolean(PREF_KEY_COMPANION_SYNC_ENABLED, false)
+
+        val updateIntent = Intent(this, OverlayService::class.java).apply {
+            action = OverlayService.ACTION_UPDATE_CONFIG
+            putExtra(OverlayService.EXTRA_DISPLAY_MODE, displayMode)
+            putExtra(OverlayService.EXTRA_AUTO_CLICK, autoClick)
+            putExtra(OverlayService.EXTRA_AFK_MODE, afkMode)
+            putExtra(OverlayService.EXTRA_SCAN_INTERVAL_SEC, scanIntervalSec)
+            putExtra(OverlayService.EXTRA_NEXT_DELAY_MS, nextDelayMs)
+            putExtra(OverlayService.EXTRA_INSTANT_TRIGGER, instantTrigger)
+            putExtra(OverlayService.EXTRA_EXTRACTION_ENGINE, extractionEngine)
+            putExtra(OverlayService.EXTRA_HUD_STYLE, hudStyle)
+            putExtra(OverlayService.EXTRA_CAMOUFLAGE, camouflage)
+            putExtra(OverlayService.EXTRA_HAPTIC, haptic)
+            putExtra(OverlayService.EXTRA_ANTI_CHEAT, antiCheat)
+            putExtra(OverlayService.EXTRA_THEME_MODE, currentThemeMode)
+            putExtra(OverlayService.EXTRA_COMPANION_HOST, host)
+            putExtra(OverlayService.EXTRA_COMPANION_PORT, port)
+            putExtra(OverlayService.EXTRA_COMPANION_SYNC_ENABLED, syncEnabled)
+        }
+        try {
+            startService(updateIntent)
+        } catch (_: Exception) {}
+    }
+
+    private fun updateCompanionStatusBadge(isConnected: Boolean) {
+        if (!::tvCompanionStatusBadge.isInitialized) return
+        if (isConnected) {
+            tvCompanionStatusBadge.text = "SYNC ARMED"
+            tvCompanionStatusBadge.setTextColor(Color.parseColor("#10B981"))
+        } else {
+            tvCompanionStatusBadge.text = "DISCONNECTED"
+            tvCompanionStatusBadge.setTextColor(Color.parseColor("#94A3B8"))
+        }
+    }
+
+    private fun testPocketHapticPulse() {
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vm = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+                vm?.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            }
+            if (vibrator == null) {
+                Toast.makeText(this, "Vibrator hardware unavailable", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val composition = VibrationEffect.startComposition()
+                composition.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.9f, 0)
+                composition.addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f, 120)
+                composition.addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 0.9f, 240)
+                vibrator.vibrate(composition.compose())
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val timings = longArrayOf(0, 100, 120, 100)
+                vibrator.vibrate(VibrationEffect.createWaveform(timings, -1))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(longArrayOf(0, 100, 120, 100), -1)
+            }
+            Toast.makeText(this, "📳 Tested 2 Haptic Pulses (Choice B)", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Haptic error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleIncomingDeepLink(intent: Intent?) {
+        val data = intent?.data ?: return
+        if (data.scheme == "omnisolve" && data.host == "sync") {
+            val host = data.getQueryParameter("host")
+            val portStr = data.getQueryParameter("port")
+            val port = portStr?.toIntOrNull() ?: 59124
+            if (!host.isNullOrBlank()) {
+                prefs.edit()
+                    .putString(PREF_KEY_COMPANION_HOST, host)
+                    .putInt(PREF_KEY_COMPANION_PORT, port)
+                    .putBoolean(PREF_KEY_COMPANION_SYNC_ENABLED, true)
+                    .apply()
+
+                if (::etCompanionHost.isInitialized) etCompanionHost.setText(host)
+                if (::etCompanionPort.isInitialized) etCompanionPort.setText(port.toString())
+                if (::swCompanionSync.isInitialized) swCompanionSync.isChecked = true
+                updateCompanionStatusBadge(true)
+
+                Toast.makeText(this, "🔗 Paired with Companion at $host:$port", Toast.LENGTH_LONG).show()
+                notifyServiceConfigChanged()
+            }
+        }
     }
 
     private fun updateIslandVisibilityButtons(selectedIndex: Int) {

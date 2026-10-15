@@ -16,11 +16,16 @@ This document outlines active development goals, planned architecture improvemen
     2. **Dynamic Island Mode:** Floating Apple-inspired pill widget overlay displaying answer and confidence.
 - **Architecture & Implementation Steps:**
   - [x] **Deep Link Intent Filter in AndroidManifest:** Registered `omnisolve://sync` scheme in [app/src/main/AndroidManifest.xml](file:///c:/Users/VIRUS/Downloads/mcq%20bypass/app/src/main/AndroidManifest.xml).
-  - [ ] **Intent Receiver in MainActivity:** Parse `intent.data` inside `MainActivity.kt` on `onResume()` / `onNewIntent()` to extract companion server IP and WebSocket port.
-  - [ ] **Background Sync Service:** Forward the connection parameters to `OverlayService.kt` to maintain persistent WebSocket sync.
-  - [ ] **Extension Options Selector:** Add a toggle in [chrome-extension/options.html](file:///c:/Users/VIRUS/Downloads/mcq%20bypass/chrome-extension/options.html) to let user generate either:
-    - `Browser QR Code` (`http://<LAN_IP>:59124/mobile`)
-    - `Native OmniSolve App QR Code` (`omnisolve://sync?host=<LAN_IP>&port=59124`)
+  - [x] **Intent Receiver in MainActivity:** Parse `intent.data` inside `MainActivity.kt` in `onCreate()` and `onNewIntent()` to extract companion server host IP and SSE/WebSocket port.
+  - [x] **Background Sync Service:** Forward connection parameters to `OverlayService.kt` with live SSE `/events` streaming for pocket haptic pulses.
+  - [x] **Extension Options Selector:** Toggle in [chrome-extension/options.html](file:///c:/Users/VIRUS/Downloads/mcq%20bypass/chrome-extension/options.html) allowing instant switching between Web App QR Code and Native OmniSolve App Deep Link QR Code.
+
+### 🛡️ 2. Stealth Privacy & OnePlus/Android 14 Clipboard Safeguards (Completed)
+- **Problem:** On OxygenOS 14/15 (OnePlus Nord 5) and Android 13+, Android displays a floating clipboard chip/toast on screen whenever text is copied to clipboard. In older versions, prompt text was copied unconditionally on every solve, exposing prompt text on the display. Furthermore, Native Mode fell back to OCR whenever the OmniSolve overlay was touched, causing both engines to perform identical screenshot captures.
+- **Fix Implemented:**
+  - **Gated Clipboard Operations:** Created `sw_auto_copy_clipboard` (default OFF in [activity_main.xml](file:///c:/Users/VIRUS/Downloads/mcq%20bypass/app/src/main/res/layout/activity_main.xml)). Gemini Web injection uses direct JavaScript string injection, eliminating clipboard touch and preventing the OnePlus Nord 5 clipboard toast popup.
+  - **Window-Aware Native Scraping:** Updated `AutoClickAccessibilityService.kt` to traverse `windows` across all `TYPE_APPLICATION` windows instead of relying on `rootInActiveWindow`. Added `flagRetrieveInteractiveWindows|flagDefault|flagIncludeNotImportantViews|flagReportViewIds` in [accessibility_service_config.xml](file:///c:/Users/VIRUS/Downloads/mcq%20bypass/app/src/main/res/xml/accessibility_service_config.xml).
+  - **OCR Fallback Preference Switch:** Added `sw_native_ocr_fallback` (preference `PREF_KEY_NATIVE_FALLBACK_OCR`) so users who select Native extraction can enforce pure accessibility node reading without screenshot captures.
 
 ---
 

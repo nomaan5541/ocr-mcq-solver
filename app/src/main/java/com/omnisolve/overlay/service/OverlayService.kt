@@ -43,6 +43,10 @@ import com.omnisolve.overlay.capture.OcrEngine
 import com.omnisolve.overlay.capture.ScreenCaptureManager
 import kotlinx.coroutines.*
 import java.util.regex.Pattern
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 class OverlayService : Service() {
 
@@ -65,6 +69,11 @@ class OverlayService : Service() {
         const val EXTRA_ANTI_CHEAT = "EXTRA_ANTI_CHEAT"
         const val EXTRA_THEME_MODE = "EXTRA_THEME_MODE"
         const val EXTRA_ISLAND_OPACITY_INDEX = "EXTRA_ISLAND_OPACITY_INDEX"
+        const val ACTION_UPDATE_CONFIG = "com.omnisolve.overlay.ACTION_UPDATE_CONFIG"
+        const val ACTION_COMPANION_SYNC = "com.omnisolve.overlay.ACTION_COMPANION_SYNC"
+        const val EXTRA_COMPANION_HOST = "EXTRA_COMPANION_HOST"
+        const val EXTRA_COMPANION_PORT = "EXTRA_COMPANION_PORT"
+        const val EXTRA_COMPANION_SYNC_ENABLED = "EXTRA_COMPANION_SYNC_ENABLED"
 
         private const val GEMINI_WEB_URL = "https://gemini.google.com/"
         private const val CHROME_USER_AGENT =
@@ -100,6 +109,16 @@ class OverlayService : Service() {
     private var nextDelayMs = 1500L
     private var isInstantTriggerEnabled = true
     private var themeMode = MainActivity.THEME_DARK
+
+    // PC Companion Live Pocket Sync
+    private var isCompanionSyncActive = false
+    private var companionSyncJob: Job? = null
+    private val companionHttpClient by lazy {
+        OkHttpClient.Builder()
+            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .connectTimeout(6, TimeUnit.SECONDS)
+            .build()
+    }
 
     // AEI Bot Question Signature Tracking (avoids duplicate solves on same question)
     @Volatile
@@ -248,62 +267,71 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForegroundSafely()
 
+        if (intent?.action == ACTION_UPDATE_CONFIG || intent?.action == ACTION_COMPANION_SYNC) {
+            applyUpdatedConfig(intent)
+            return START_STICKY
+        }
+
+        val prefs = getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
+
         displayMode = intent?.getStringExtra(EXTRA_DISPLAY_MODE)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getString(MainActivity.PREF_KEY_DISPLAY_MODE, MainActivity.MODE_STEALTH)
-                ?: MainActivity.MODE_STEALTH
+            ?: prefs.getString(MainActivity.PREF_KEY_DISPLAY_MODE, MainActivity.MODE_STEALTH)
+            ?: MainActivity.MODE_STEALTH
 
         isAutoClickEnabled = intent?.getBooleanExtra(EXTRA_AUTO_CLICK, false)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_AUTO_CLICK, false)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_AUTO_CLICK, false)
 
         isAfkAutoAdvanceEnabled = intent?.getBooleanExtra(EXTRA_AFK_MODE, false)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_AFK_MODE, false)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_AFK_MODE, false)
 
         val scanSec = intent?.getIntExtra(EXTRA_SCAN_INTERVAL_SEC, -1) ?: -1
-        val savedScanSec = if (scanSec > 0) scanSec else getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-            .getInt(MainActivity.PREF_KEY_SCAN_INTERVAL_SEC, 3)
+        val savedScanSec = if (scanSec > 0) scanSec else prefs.getInt(MainActivity.PREF_KEY_SCAN_INTERVAL_SEC, 3)
         scanIntervalMs = (savedScanSec.coerceIn(1, 10) * 1000L)
 
         val nextDelay = intent?.getIntExtra(EXTRA_NEXT_DELAY_MS, -1) ?: -1
-        nextDelayMs = if (nextDelay > 0) nextDelay.toLong() else getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-            .getInt(MainActivity.PREF_KEY_NEXT_DELAY_MS, 1500).toLong().coerceIn(500L, 4000L)
+        nextDelayMs = if (nextDelay > 0) nextDelay.toLong() else prefs.getInt(MainActivity.PREF_KEY_NEXT_DELAY_MS, 1500).toLong().coerceIn(500L, 4000L)
 
         isInstantTriggerEnabled = intent?.getBooleanExtra(EXTRA_INSTANT_TRIGGER, true)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_INSTANT_TRIGGER, true)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_INSTANT_TRIGGER, true)
 
         extractionEngine = intent?.getStringExtra(EXTRA_EXTRACTION_ENGINE)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getString(MainActivity.PREF_KEY_EXTRACTION_ENGINE, MainActivity.ENGINE_NATIVE)
-                ?: MainActivity.ENGINE_NATIVE
+            ?: prefs.getString(MainActivity.PREF_KEY_EXTRACTION_ENGINE, MainActivity.ENGINE_NATIVE)
+            ?: MainActivity.ENGINE_NATIVE
 
         hudStyle = intent?.getStringExtra(EXTRA_HUD_STYLE)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getString(MainActivity.PREF_KEY_HUD_STYLE, MainActivity.HUD_STYLE_ISLAND)
-                ?: MainActivity.HUD_STYLE_ISLAND
+            ?: prefs.getString(MainActivity.PREF_KEY_HUD_STYLE, MainActivity.HUD_STYLE_ISLAND)
+            ?: MainActivity.HUD_STYLE_ISLAND
 
         isCamouflageEnabled = intent?.getBooleanExtra(EXTRA_CAMOUFLAGE, false)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_CAMOUFLAGE, false)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_CAMOUFLAGE, false)
 
         isHapticFeedbackEnabled = intent?.getBooleanExtra(EXTRA_HAPTIC, true)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_HAPTIC, true)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_HAPTIC, true)
 
         isAntiCheatEnabled = intent?.getBooleanExtra(EXTRA_ANTI_CHEAT, true)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getBoolean(MainActivity.PREF_KEY_ANTI_CHEAT, true)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_ANTI_CHEAT, true)
 
         themeMode = intent?.getStringExtra(EXTRA_THEME_MODE)
-            ?: getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
-                .getString(MainActivity.PREF_KEY_THEME_MODE, MainActivity.THEME_DARK)
-                ?: MainActivity.THEME_DARK
+            ?: prefs.getString(MainActivity.PREF_KEY_THEME_MODE, MainActivity.THEME_DARK)
+            ?: MainActivity.THEME_DARK
 
         val opacityIdx = intent?.getIntExtra(EXTRA_ISLAND_OPACITY_INDEX, -1) ?: -1
         if (opacityIdx in islandOpacityLevels.indices) {
             currentIslandOpacityIndex = opacityIdx
+        }
+
+        // Companion Pocket Sync Initialization
+        val syncEnabled = intent?.getBooleanExtra(EXTRA_COMPANION_SYNC_ENABLED, false)
+            ?: prefs.getBoolean(MainActivity.PREF_KEY_COMPANION_SYNC_ENABLED, false)
+        val companionHost = intent?.getStringExtra(EXTRA_COMPANION_HOST)
+            ?: prefs.getString(MainActivity.PREF_KEY_COMPANION_HOST, "192.168.1.100") ?: "192.168.1.100"
+        val companionPort = intent?.getIntExtra(EXTRA_COMPANION_PORT, prefs.getInt(MainActivity.PREF_KEY_COMPANION_PORT, 59124))
+            ?: 59124
+
+        if (syncEnabled) {
+            startCompanionSync(companionHost, companionPort)
+        } else {
+            stopCompanionSync()
         }
 
         val resultCode = intent?.getIntExtra(EXTRA_RESULT_CODE, Activity.RESULT_CANCELED)
@@ -326,8 +354,124 @@ class OverlayService : Service() {
         return START_NOT_STICKY
     }
 
+    private fun applyUpdatedConfig(intent: Intent?) {
+        val prefs = getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
+        if (intent != null) {
+            if (intent.hasExtra(EXTRA_EXTRACTION_ENGINE)) {
+                extractionEngine = intent.getStringExtra(EXTRA_EXTRACTION_ENGINE) ?: extractionEngine
+            }
+            if (intent.hasExtra(EXTRA_DISPLAY_MODE)) {
+                displayMode = intent.getStringExtra(EXTRA_DISPLAY_MODE) ?: displayMode
+            }
+            if (intent.hasExtra(EXTRA_AUTO_CLICK)) {
+                isAutoClickEnabled = intent.getBooleanExtra(EXTRA_AUTO_CLICK, isAutoClickEnabled)
+            }
+            if (intent.hasExtra(EXTRA_AFK_MODE)) {
+                isAfkAutoAdvanceEnabled = intent.getBooleanExtra(EXTRA_AFK_MODE, isAfkAutoAdvanceEnabled)
+            }
+            if (intent.hasExtra(EXTRA_SCAN_INTERVAL_SEC)) {
+                scanIntervalMs = intent.getIntExtra(EXTRA_SCAN_INTERVAL_SEC, 3) * 1000L
+            }
+            if (intent.hasExtra(EXTRA_NEXT_DELAY_MS)) {
+                nextDelayMs = intent.getIntExtra(EXTRA_NEXT_DELAY_MS, 1500).toLong()
+            }
+            if (intent.hasExtra(EXTRA_INSTANT_TRIGGER)) {
+                isInstantTriggerEnabled = intent.getBooleanExtra(EXTRA_INSTANT_TRIGGER, isInstantTriggerEnabled)
+            }
+            if (intent.hasExtra(EXTRA_CAMOUFLAGE)) {
+                isCamouflageEnabled = intent.getBooleanExtra(EXTRA_CAMOUFLAGE, isCamouflageEnabled)
+            }
+            if (intent.hasExtra(EXTRA_HAPTIC)) {
+                isHapticFeedbackEnabled = intent.getBooleanExtra(EXTRA_HAPTIC, isHapticFeedbackEnabled)
+            }
+            if (intent.hasExtra(EXTRA_ANTI_CHEAT)) {
+                isAntiCheatEnabled = intent.getBooleanExtra(EXTRA_ANTI_CHEAT, isAntiCheatEnabled)
+            }
+            if (intent.hasExtra(EXTRA_COMPANION_SYNC_ENABLED)) {
+                val syncEnabled = intent.getBooleanExtra(EXTRA_COMPANION_SYNC_ENABLED, false)
+                val host = intent.getStringExtra(EXTRA_COMPANION_HOST) ?: prefs.getString(MainActivity.PREF_KEY_COMPANION_HOST, "192.168.1.100") ?: "192.168.1.100"
+                val port = intent.getIntExtra(EXTRA_COMPANION_PORT, prefs.getInt(MainActivity.PREF_KEY_COMPANION_PORT, 59124))
+                if (syncEnabled) {
+                    startCompanionSync(host, port)
+                } else {
+                    stopCompanionSync()
+                }
+            }
+        }
+    }
+
+    private fun startCompanionSync(host: String, port: Int) {
+        if (isCompanionSyncActive && companionSyncJob?.isActive == true) return
+        isCompanionSyncActive = true
+        companionSyncJob?.cancel()
+        companionSyncJob = serviceScope.launch(Dispatchers.IO) {
+            val url = "http://$host:$port/events"
+            Log.d(TAG, "Starting Companion SSE sync at $url")
+            while (isActive && isCompanionSyncActive) {
+                try {
+                    val request = Request.Builder()
+                        .url(url)
+                        .header("Accept", "text/event-stream")
+                        .build()
+                    val response = companionHttpClient.newCall(request).execute()
+                    if (!response.isSuccessful) {
+                        delay(3000)
+                        continue
+                    }
+                    withContext(Dispatchers.Main) {
+                        tvIslandTitle?.text = "💻 Sync Active"
+                    }
+                    val source = response.body?.source() ?: break
+                    var currentEvent = "message"
+                    while (isActive && isCompanionSyncActive && !source.exhausted()) {
+                        val line = source.readUtf8Line() ?: break
+                        if (line.startsWith("event:")) {
+                            currentEvent = line.substring(6).trim()
+                        } else if (line.startsWith("data:")) {
+                            val dataStr = line.substring(5).trim()
+                            if (currentEvent == "solve") {
+                                try {
+                                    val json = JSONObject(dataStr)
+                                    val answer = json.optString("answer", "").trim().uppercase()
+                                    if (answer.length == 1 && answer in "ABCD") {
+                                        withContext(Dispatchers.Main) {
+                                            triggerHapticFeedback(answer)
+                                            setAnswerUI(answer, "#10B981")
+                                            if (isAutoClickEnabled && pendingAutoClickBlocks != null) {
+                                                performAutoClick(answer, pendingAutoClickBlocks!!)
+                                            }
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w(TAG, "Companion event JSON parse error: $dataStr", e)
+                                }
+                            } else if (currentEvent == "panic") {
+                                withContext(Dispatchers.Main) {
+                                    setAnswerUI("", "#64748B")
+                                    if (isWindowVisible) toggleGeminiWindow()
+                                }
+                            }
+                        } else if (line.isEmpty()) {
+                            currentEvent = "message"
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Companion sync connection dropped: ${e.message}. Reconnecting in 4s...")
+                    delay(4000)
+                }
+            }
+        }
+    }
+
+    private fun stopCompanionSync() {
+        isCompanionSyncActive = false
+        companionSyncJob?.cancel()
+        companionSyncJob = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        stopCompanionSync()
         stopAutoClickBot()
         serviceScope.cancel()
         unregisterVolumeButtonReceiver()
@@ -871,8 +1015,12 @@ class OverlayService : Service() {
             return
         }
 
-        val isNativeMode = (extractionEngine == MainActivity.ENGINE_NATIVE)
+        val prefs = getSharedPreferences("OmniSolvePrefs", Context.MODE_PRIVATE)
+        val currentEngine = prefs.getString(MainActivity.PREF_KEY_EXTRACTION_ENGINE, extractionEngine) ?: extractionEngine
+        val isNativeMode = (currentEngine == MainActivity.ENGINE_NATIVE)
         val a11yActive = AutoClickAccessibilityService.isServiceRunning()
+        val allowOcrFallback = prefs.getBoolean(MainActivity.PREF_KEY_NATIVE_FALLBACK_OCR, true)
+        val autoCopyClipboard = prefs.getBoolean(MainActivity.PREF_KEY_AUTO_COPY_CLIPBOARD, false)
 
         if (!isNativeMode && screenCaptureManager == null) {
             if (!autoClickMode) {
@@ -880,11 +1028,15 @@ class OverlayService : Service() {
             }
             return
         }
-        if (isNativeMode && !a11yActive && screenCaptureManager == null) {
-            if (!autoClickMode) {
-                Toast.makeText(this, "Please enable Accessibility Service or grant Screen Capture permission.", Toast.LENGTH_SHORT).show()
+        if (isNativeMode && !a11yActive) {
+            if (allowOcrFallback && screenCaptureManager != null) {
+                Log.i(TAG, "Native mode active but Accessibility Service not running; will use OCR fallback")
+            } else {
+                if (!autoClickMode) {
+                    Toast.makeText(this, "Please enable Accessibility Service for Native mode.", Toast.LENGTH_SHORT).show()
+                }
+                return
             }
-            return
         }
 
         isScanning = true
@@ -907,7 +1059,7 @@ class OverlayService : Service() {
                         extractedText = scraped.first
                         textBlocks = scraped.second
                         Log.d(TAG, "Native accessibility scraping succeeded: ${textBlocks.size} blocks, ${extractedText.length} chars")
-                    } else if (screenCaptureManager != null) {
+                    } else if (allowOcrFallback && screenCaptureManager != null) {
                         Log.w(TAG, "Native scraping returned empty, falling back to Screen Capture OCR...")
                         val ocrData = captureAndOcr()
                         if (ocrData == null) {
@@ -920,6 +1072,7 @@ class OverlayService : Service() {
                         textBlocks = ocrData.second
                         bitmapToRecycle = ocrData.third
                     } else {
+                        Log.w(TAG, "Native scraping returned empty and OCR fallback disabled/unavailable")
                         setAnswerUI("TXT", "#F59E0B")
                         btnWindowScan?.text = "⚡ Solve"
                         isScanning = false
@@ -979,8 +1132,15 @@ class OverlayService : Service() {
                 // 5. Strict single-letter answer prompt formulation
                 val promptText = "CRITICAL INSTRUCTION: You are an expert MCQ Solver. Read the question and the choices below. Identify the single correct option letter (A, B, C, or D).\nSTRICT RULE: Reply ONLY with 'CORRECT_OPTION: X' where X is strictly one letter A, B, C, or D. Do not write any explanations, markdown or greetings.\n\n$extractedText"
 
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("OCR MCQ Solver Question", promptText))
+                if (autoCopyClipboard) {
+                    try {
+                        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipboard.setPrimaryClip(ClipData.newPlainText("OCR MCQ Solver Question", promptText))
+                        Log.d(TAG, "Question copied to clipboard (enabled in settings)")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Clipboard copy error: ${e.message}")
+                    }
+                }
 
                 // 6. Inject into Gemini Web and activate response watcher
                 btnWindowScan?.text = "✨ Solving..."

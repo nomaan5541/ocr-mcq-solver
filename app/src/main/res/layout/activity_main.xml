@@ -565,6 +565,66 @@
 
             </LinearLayout>
 
+            <!-- ─── ADVANCED STEALTH & CLIPBOARD CONTROLS ───────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_stealth_advanced"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡️ Stealth &amp; Privacy Safeguards"
+                    android:textColor="#F0F4FD"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <!-- Auto-Copy Prompt to Clipboard Switch -->
+                <Switch
+                    android:id="@+id/sw_auto_copy_clipboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:checked="false"
+                    android:text="📋 Auto-Copy Prompt to Clipboard"
+                    android:textColor="#F0F4FD"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Disabled by default. Prevents OnePlus/ColorOS/Samsung popup preview chips on screen."
+                    android:textColor="#94A3B8"
+                    android:textSize="10sp" />
+
+                <!-- Native Fallback to OCR Switch -->
+                <Switch
+                    android:id="@+id/sw_native_ocr_fallback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:checked="true"
+                    android:text="🔄 Auto-Fallback to OCR in Native Mode"
+                    android:textColor="#38BDF8"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="When enabled, if an app lacks native accessibility text (Canvas/Flutter), automatically falls back to OCR."
+                    android:textColor="#94A3B8"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
             <!-- ─── SECTION 3: Overlay Display Mode ─────────────────────────────── -->
             <LinearLayout
                 android:id="@+id/card_display_mode"
@@ -607,6 +667,115 @@
                         android:textColor="#E2E8F0"
                         android:textSize="12sp" />
                 </RadioGroup>
+            </LinearLayout>
+
+            <!-- ─── SECTION: PC COMPANION WIRELESS SYNC ────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/card_companion_sync"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_glass_card_accent"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="💻 PC Companion Wireless Sync"
+                        android:textColor="#38BDF8"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_companion_status_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_glass_chip"
+                        android:paddingStart="7dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="7dp"
+                        android:paddingBottom="2dp"
+                        android:text="DISCONNECTED"
+                        android:textColor="#94A3B8"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Receives solved answers live from PC Chrome Extension / Companion. Vibrates in pocket even when phone screen is locked."
+                    android:textColor="#94A3B8"
+                    android:textSize="11sp" />
+
+                <Switch
+                    android:id="@+id/sw_companion_sync"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:checked="false"
+                    android:text="🔗 Enable Live Pocket Sync"
+                    android:textColor="#F0F4FD"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/et_companion_host"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="3"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_glass_chip"
+                        android:hint="PC IP (e.g. 192.168.1.50)"
+                        android:inputType="textUri"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:textColor="#F8FAFC"
+                        android:textColorHint="#64748B"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/et_companion_port"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1.3"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_glass_chip"
+                        android:hint="59124"
+                        android:inputType="number"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:text="59124"
+                        android:textColor="#F8FAFC"
+                        android:textColorHint="#64748B"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/btn_test_sync_vibration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_chip_action"
+                        android:text="📳 Test"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <!-- ─── SECTION 4: AEI Autonomous Bot Control Deck ──────────────────── -->

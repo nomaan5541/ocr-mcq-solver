@@ -118,7 +118,12 @@ const openMobileUrlLink = document.getElementById("openMobileUrlLink");
 const mobileSyncDot = document.getElementById("mobileSyncDot");
 const mobileClientCountLabel = document.getElementById("mobileClientCountLabel");
 const qrCodeContainer = document.getElementById("qrCodeContainer");
+const qrCodeCaption = document.getElementById("qrCodeCaption");
+const btnQrTargetWeb = document.getElementById("btnQrTargetWeb");
+const btnQrTargetNative = document.getElementById("btnQrTargetNative");
 const mobileTestStatus = document.getElementById("mobileTestStatus");
+let currentQrTargetMode = "web";
+let lastCompanionData = null;
 
 const clipboardAutoSolveCheckbox = document.getElementById("clipboardAutoSolveCheckbox");
 const testScreenshotBtn = document.getElementById("testScreenshotBtn");
@@ -835,6 +840,52 @@ function renderQRCodeSVG(url) {
   `;
 }
 
+function updateQrCodeDisplay() {
+  if (!lastCompanionData) return;
+  if (currentQrTargetMode === "native") {
+    const nativeUrl = lastCompanionData.native_sync_url || `omnisolve://sync?host=${lastCompanionData.local_ip || '127.0.0.1'}&port=${lastCompanionData.port || 59124}`;
+    renderQRCodeSVG(nativeUrl);
+  } else {
+    if (lastCompanionData.mobile_url) {
+      renderQRCodeSVG(lastCompanionData.mobile_url);
+    }
+  }
+}
+
+if (btnQrTargetWeb && btnQrTargetNative) {
+  btnQrTargetWeb.addEventListener("click", () => {
+    currentQrTargetMode = "web";
+    btnQrTargetWeb.style.borderColor = "#38bdf8";
+    btnQrTargetWeb.style.background = "rgba(56,189,248,0.15)";
+    btnQrTargetWeb.style.color = "#38bdf8";
+    btnQrTargetWeb.style.fontWeight = "600";
+
+    btnQrTargetNative.style.borderColor = "rgba(255,255,255,0.15)";
+    btnQrTargetNative.style.background = "transparent";
+    btnQrTargetNative.style.color = "#94a3b8";
+    btnQrTargetNative.style.fontWeight = "400";
+
+    if (qrCodeCaption) qrCodeCaption.textContent = "📷 Scan to open Web Browser Sync";
+    updateQrCodeDisplay();
+  });
+
+  btnQrTargetNative.addEventListener("click", () => {
+    currentQrTargetMode = "native";
+    btnQrTargetNative.style.borderColor = "#10b981";
+    btnQrTargetNative.style.background = "rgba(16,185,129,0.15)";
+    btnQrTargetNative.style.color = "#10b981";
+    btnQrTargetNative.style.fontWeight = "600";
+
+    btnQrTargetWeb.style.borderColor = "rgba(255,255,255,0.15)";
+    btnQrTargetWeb.style.background = "transparent";
+    btnQrTargetWeb.style.color = "#94a3b8";
+    btnQrTargetWeb.style.fontWeight = "400";
+
+    if (qrCodeCaption) qrCodeCaption.textContent = "📲 Scan to pair Native Android App";
+    updateQrCodeDisplay();
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Companion Heartbeat Check
 // ---------------------------------------------------------------------------
@@ -851,10 +902,11 @@ async function checkCompanionServer() {
       if (companionEngineDesc) companionEngineDesc.textContent = "100% Invisible • 0 tabs • 0 windows • Unlimited Free";
 
       // Update Mobile Sync info
+      lastCompanionData = data;
       if (data.mobile_url) {
         if (mobileUrlInput) mobileUrlInput.value = data.mobile_url;
         if (openMobileUrlLink) openMobileUrlLink.href = data.mobile_url;
-        renderQRCodeSVG(data.mobile_url);
+        updateQrCodeDisplay();
       }
       if (mobileClientCountLabel) {
         const count = data.active_mobile_clients || 0;

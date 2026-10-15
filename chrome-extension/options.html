@@ -442,8 +442,13 @@
 
           <!-- Dynamic QR Code Container -->
           <div class="qr-box-wrapper">
+            <!-- QR Target Mode Selector -->
+            <div style="display:flex; gap:0.35rem; margin-bottom:0.6rem; width:100%;">
+              <button type="button" id="btnQrTargetWeb" class="btn btn-outline" style="flex:1; padding:0.35rem 0.5rem; font-size:0.75rem; border-color:#38bdf8; background:rgba(56,189,248,0.15); color:#38bdf8; font-weight:600;">📱 Web App</button>
+              <button type="button" id="btnQrTargetNative" class="btn btn-outline" style="flex:1; padding:0.35rem 0.5rem; font-size:0.75rem; border-color:rgba(255,255,255,0.15); color:#94a3b8;">📲 Native App</button>
+            </div>
             <div id="qrCodeContainer" class="qr-canvas-box" title="Scan with phone camera to open instantly"></div>
-            <span class="qr-caption">📷 Scan with Phone Camera</span>
+            <span id="qrCodeCaption" class="qr-caption">📷 Scan with Phone Camera</span>
           </div>
         </div>
       </div>

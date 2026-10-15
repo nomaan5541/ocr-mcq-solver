@@ -769,7 +769,9 @@ class UnifiedCompanionHandler(BaseHTTPRequestHandler):
                 "profile": gemini_worker.profile_dir,
                 "platform": sys.platform,
                 "local_ip": LOCAL_IP,
+                "port": PORT,
                 "mobile_url": f"http://{LOCAL_IP}:{PORT}/mobile",
+                "native_sync_url": f"omnisolve://sync?host={LOCAL_IP}&port={PORT}",
                 "clipboard_auto_solve": clipboard_auto_solve_enabled,
                 "active_mobile_clients": len(sse_clients)
             }

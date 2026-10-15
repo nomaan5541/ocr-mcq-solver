@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 
 /**
  * Minimal AccessibilityService that enables programmatic screen tapping and native UI inspection.
@@ -157,18 +158,51 @@ class AutoClickAccessibilityService : AccessibilityService() {
     }
 
     /**
-     * Inspect active window node hierarchy directly without taking screenshots.
-     * Extracts all visible text from native Android widgets (TextView, RadioButton, Button, etc.)
+     * Inspect interactive application windows directly without taking screenshots.
+     * Searches all application windows below the OmniSolve overlay to extract native text
      * and maps them to their exact screen bounding rectangles.
      */
     private fun scrapeCurrentWindow(): Pair<String, List<Pair<String, Rect>>>? {
-        val root = try {
-            rootInActiveWindow
+        val candidateRoots = mutableListOf<AccessibilityNodeInfo>()
+
+        // 1. Try querying windows list (requires flagRetrieveInteractiveWindows)
+        try {
+            val windowList = windows
+            if (!windowList.isNullOrEmpty()) {
+                // Traverse in reverse order or application type to find the foreground quiz app
+                for (w in windowList) {
+                    val wRoot = try { w.root } catch (_: Exception) { null } ?: continue
+                    val pkg = wRoot.packageName?.toString() ?: ""
+                    if (pkg == packageName) continue // Skip OmniSolve overlay windows
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (w.type == AccessibilityWindowInfo.TYPE_APPLICATION || w.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                            candidateRoots.add(wRoot)
+                        } else {
+                            candidateRoots.add(wRoot)
+                        }
+                    } else {
+                        candidateRoots.add(wRoot)
+                    }
+                }
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to access rootInActiveWindow: ${e.message}")
-            null
-        } ?: run {
-            Log.w(TAG, "rootInActiveWindow is null — window content not accessible")
+            Log.w(TAG, "Error accessing windows list: ${e.message}")
+        }
+
+        // 2. Fallback to rootInActiveWindow if no windows found
+        if (candidateRoots.isEmpty()) {
+            try {
+                val root = rootInActiveWindow
+                if (root != null && root.packageName?.toString() != packageName) {
+                    candidateRoots.add(root)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to access rootInActiveWindow: ${e.message}")
+            }
+        }
+
+        if (candidateRoots.isEmpty()) {
+            Log.w(TAG, "No accessible application root window found")
             return null
         }
 
@@ -218,7 +252,7 @@ class AutoClickAccessibilityService : AccessibilityService() {
         }
 
         fun traverse(node: AccessibilityNodeInfo?, depth: Int = 0) {
-            if (node == null || depth > 16) return
+            if (node == null || depth > 18) return
 
             // Skip OmniSolve's own overlay windows/views
             if (node.packageName != null && node.packageName.toString() == packageName) {
@@ -258,10 +292,12 @@ class AutoClickAccessibilityService : AccessibilityService() {
             }
         }
 
-        try {
-            traverse(root, 0)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error traversing accessibility tree: ${e.message}", e)
+        for (rootNode in candidateRoots) {
+            try {
+                traverse(rootNode, 0)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error traversing accessibility tree: ${e.message}", e)
+            }
         }
 
         if (rawBlocks.isEmpty()) {
@@ -304,7 +340,30 @@ class AutoClickAccessibilityService : AccessibilityService() {
      * Returns true if a native click was successfully handled.
      */
     private fun tryNativeClick(x: Float, y: Float): Boolean {
-        val root = try { rootInActiveWindow } catch (_: Exception) { null } ?: return false
+        val candidateRoots = mutableListOf<AccessibilityNodeInfo>()
+        try {
+            val windowList = windows
+            if (!windowList.isNullOrEmpty()) {
+                for (w in windowList) {
+                    val wRoot = try { w.root } catch (_: Exception) { null } ?: continue
+                    if (wRoot.packageName?.toString() != packageName) {
+                        candidateRoots.add(wRoot)
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        if (candidateRoots.isEmpty()) {
+            try {
+                val root = rootInActiveWindow
+                if (root != null && root.packageName?.toString() != packageName) {
+                    candidateRoots.add(root)
+                }
+            } catch (_: Exception) {}
+        }
+
+        if (candidateRoots.isEmpty()) return false
+
         val px = x.toInt()
         val py = y.toInt()
         val tempRect = Rect()
@@ -327,18 +386,21 @@ class AutoClickAccessibilityService : AccessibilityService() {
             }
         }
 
-        try {
-            findClickableNode(root)
-            bestNode?.let {
-                val success = it.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                if (success) {
-                    Log.d(TAG, "Native ACTION_CLICK dispatched successfully to ${it.className}")
-                    return true
+        for (root in candidateRoots) {
+            try {
+                findClickableNode(root)
+                bestNode?.let {
+                    val success = it.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    if (success) {
+                        Log.d(TAG, "Native ACTION_CLICK dispatched successfully to ${it.className}")
+                        return true
+                    }
                 }
+            } catch (e: Exception) {
+                Log.w(TAG, "Native ACTION_CLICK error: ${e.message}")
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "Native ACTION_CLICK error: ${e.message}")
         }
         return false
     }
 }
+
